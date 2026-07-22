@@ -48,3 +48,11 @@ This directory contains all artifacts required to guide AI assistants during sof
 7. Commit is created.
 
 No AI-generated code is accepted without human review.
+
+## AI Provider Independence
+
+The `.ai` directory contains vendor-independent guidance for AI-assisted software engineering.
+
+Its contents are intentionally designed to be reusable regardless of the AI provider used during development.
+
+The current MVP recommends local execution using Ollama and an open-source coding model, but the project documentation must remain independent from any specific vendor.

@@ -84,6 +84,22 @@ Every generated implementation must:
 
 ---
 
+## AI Assistant
+
+This project adopts a vendor-independent AI strategy.
+
+AI assistants are expected to:
+
+- Follow all Architecture Decision Records (ADRs).
+- Respect Product Documentation (DIPs).
+- Preserve architectural consistency.
+- Prefer simplicity over unnecessary complexity.
+- Never introduce technology-specific assumptions unless explicitly requested.
+
+The choice of AI provider is considered an implementation detail and must not influence the project's architecture or documentation.
+
+---
+
 # Coding Guidelines
 
 Prefer composition over inheritance.
