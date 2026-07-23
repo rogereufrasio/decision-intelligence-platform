@@ -2,33 +2,103 @@
 
 ## Purpose
 
-Ollama is the recommended AI provider for the MVP development environment.
+Ollama is the official AI provider for the MVP development environment.
 
-## Reasons
+Its purpose is to execute local coding models while preserving the project's principles:
 
-- Zero licensing cost.
-- Local execution.
-- Open-source ecosystem.
-- Privacy by default.
-- No dependency on external cloud services.
-- Compatible with the project's Open Source First strategy.
+- Zero Cost
+- Open Source First
+- Vendor Independence
+- Local Execution
 
-## Recommended Models
+---
 
-Preferred:
+## Installation
 
-- Qwen2.5-Coder
+Windows
 
-Alternatives:
+https://ollama.com/download
 
-- DeepSeek Coder
-- CodeLlama
-- StarCoder2
+---
+
+## Verify Installation
+
+```bash
+ollama --version
+```
+
+---
+
+## Pull Recommended Model
+
+```bash
+ollama pull qwen2.5-coder:14b
+```
+
+If hardware resources are limited:
+
+```bash
+ollama pull qwen2.5-coder:7b
+```
+
+---
+
+## Start Interactive Session
+
+```bash
+ollama run qwen2.5-coder:14b
+```
+
+or
+
+```bash
+ollama run qwen2.5-coder:7b
+```
+
+---
+
+## Development Workflow
+
+ChatGPT
+
+↓
+
+Architecture
+Backlog
+Review
+
+↓
+
+Prompt
+
+↓
+
+Ollama
+
+↓
+
+Implementation
+
+↓
+
+Developer
+
+↓
+
+Validation
+
+↓
+
+Git Commit
+
+---
 
 ## Responsibilities
 
-Ollama is used exclusively as a software engineering assistant.
+Ollama is responsible only for software implementation assistance.
 
-It does not influence the architecture, product decisions or business rules of the Decision Intelligence Platform.
+Product decisions, architecture decisions and documentation remain governed by:
 
-Those decisions remain documented through ADRs and Product Documentation (DIPs).
+- ADRs
+- DIPs
+- AGENTS.md

@@ -1,3 +1,21 @@
 # Backend
 
-This directory contains the backend application.
+The backend is responsible for exposing the Decision Intelligence Platform APIs.
+
+## Technology Stack
+
+- Python
+- FastAPI
+- uv
+- Pydantic
+- Uvicorn
+
+## Architectural Principles
+
+- Clean Architecture
+- Domain-Driven Design (DDD)
+- SOLID
+- Dependency Injection
+- API First
+
+No business logic is implemented during the bootstrap phase.
