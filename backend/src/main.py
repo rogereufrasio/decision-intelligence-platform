@@ -1,15 +1,11 @@
 from fastapi import FastAPI
 
+from src.api.router import api_router
+
 app = FastAPI(
     title="Decision Intelligence Platform API",
-    version="0.1.0",
     description="Decision Intelligence Platform Backend",
+    version="0.1.0",
 )
 
-
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy",
-        "service": "decision-intelligence-platform",
-    }
+app.include_router(api_router)
