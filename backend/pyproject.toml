@@ -2,11 +2,17 @@
 name = "decision-intelligence-platform-backend"
 version = "0.1.0"
 description = "Decision Intelligence Platform Backend"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
+authors = [
+    { name = "Roger Eufrasio" }
+]
+
+readme = "README.md"
 
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
+    "pydantic",
 ]
 
 [dependency-groups]

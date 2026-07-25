@@ -15,7 +15,7 @@ The backend is responsible for exposing the Decision Intelligence Platform APIs.
 - Clean Architecture
 - Domain-Driven Design (DDD)
 - SOLID
-- Dependency Injection
+
 - API First
 
 No business logic is implemented during the bootstrap phase.
