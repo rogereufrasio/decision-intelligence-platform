@@ -1,18 +1,16 @@
 import pytest
 
-from src.application.travel.search_travel import SearchTravelUseCase
 from src.infrastructure.providers.mock_provider import MockTravelProvider
 from src.shared.models import TravelSearchRequest
 
 
 @pytest.mark.asyncio
-async def test_search_use_case():
+async def test_mock_provider():
 
-    use_case = SearchTravelUseCase(
-        provider=MockTravelProvider(),
-    )
+    provider = MockTravelProvider()
 
-    response = await use_case.execute(
+    response = await provider.search(
+
         TravelSearchRequest(
             origin="GIG",
             destination="BRC",
@@ -20,7 +18,9 @@ async def test_search_use_case():
             return_date="2026-09-07",
             adults=2,
         )
+
     )
 
     assert response.provider == "mock"
+
     assert response.status == "success"
