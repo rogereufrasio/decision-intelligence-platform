@@ -8,5 +8,5 @@ async def test_amadeus_provider_requires_credentials():
 
     provider = AmadeusProvider()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Amadeus credentials are not configured"):
         await provider.authenticate()
