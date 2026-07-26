@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     amadeus_client_id: str | None = None
     amadeus_client_secret: str | None = None
 
+    http_timeout_seconds: int = 30
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",

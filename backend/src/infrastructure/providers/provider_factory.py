@@ -4,11 +4,6 @@ from src.infrastructure.providers.mock_provider import MockTravelProvider
 
 
 class ProviderFactory:
-    """
-    Factory responsável pela criação dos providers de viagem.
-
-    Novos providers serão adicionados aqui.
-    """
 
     @staticmethod
     def create(
