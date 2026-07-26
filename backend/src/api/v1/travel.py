@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from src.infrastructure.providers.mock_provider import MockTravelProvider
 from src.application.travel.search_travel import SearchTravelUseCase
+from src.infrastructure.providers.factory import ProviderFactory
 from src.shared.models import (
     TravelSearchRequest,
     TravelSearchResponse,
@@ -13,8 +13,9 @@ router = APIRouter(
 )
 
 use_case = SearchTravelUseCase(
-    provider=MockTravelProvider(),
+    provider=ProviderFactory.create(),
 )
+
 
 @router.post(
     "/search",

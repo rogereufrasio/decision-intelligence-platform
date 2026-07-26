@@ -24,3 +24,4 @@ def test_search_mock():
 
     assert body["provider"] == "mock"
     assert body["status"] == "success"
+    assert body["message"] == "Travel search received: GIG -> BRC"
