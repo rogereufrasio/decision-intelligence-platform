@@ -3,6 +3,7 @@ from src.domain.travel.provider import TravelProvider
 from src.core.config import get_settings
 from src.shared.models import TravelSearchRequest
 from src.infrastructure.providers.base_provider import BaseProvider
+from src.infrastructure.http.client import HttpClient
 
 
 class AmadeusProvider(
@@ -10,8 +11,12 @@ class AmadeusProvider(
     TravelProvider,
 ):
 
-    def __init__(self):
+    def __init__(
+            self,
+            client: HttpClient,
+            ):
 
+        self.client = client
         settings = get_settings()
 
         self.client_id = settings.amadeus_client_id

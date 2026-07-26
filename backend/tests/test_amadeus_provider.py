@@ -1,11 +1,14 @@
 import pytest
 
 from src.infrastructure.providers.amadeus_provider import AmadeusProvider
+from src.infrastructure.http.client import HttpClient
 
 
 def test_normalize_amadeus_offers():
 
-    provider = AmadeusProvider()
+    provider = AmadeusProvider(
+        client=HttpClient()
+    )
 
     data = {
         "data": [
@@ -28,7 +31,9 @@ def test_normalize_amadeus_offers():
 @pytest.mark.asyncio
 async def test_amadeus_provider_requires_credentials():
 
-    provider = AmadeusProvider()
+    provider = AmadeusProvider(
+        client=HttpClient()
+    )
 
     with pytest.raises(
         ValueError,

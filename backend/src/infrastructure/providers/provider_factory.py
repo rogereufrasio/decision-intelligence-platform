@@ -1,4 +1,5 @@
 from src.domain.travel.provider import TravelProvider
+from src.infrastructure.http.client import HttpClient
 from src.infrastructure.providers.amadeus_provider import AmadeusProvider
 from src.infrastructure.providers.mock_provider import MockTravelProvider
 
@@ -14,7 +15,9 @@ class ProviderFactory:
             return MockTravelProvider()
 
         if provider_name == "amadeus":
-            return AmadeusProvider()
+            return AmadeusProvider(
+                client=HttpClient()
+            )
 
         raise ValueError(
             f"Unsupported travel provider: {provider_name}"
