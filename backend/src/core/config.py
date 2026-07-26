@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     travel_provider: str = "mock"
 
     amadeus_base_url: str = "https://test.api.amadeus.com"
+    amadeus_client_id: str | None = None
+    amadeus_client_secret: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
