@@ -1,19 +1,9 @@
 from src.domain.travel.models import TravelResult
 from src.domain.travel.provider import TravelProvider
-from src.infrastructure.providers.base_provider import BaseProvider
 from src.shared.models import TravelSearchRequest
 
 
-class MockTravelProvider(
-    BaseProvider,
-    TravelProvider,
-):
-
-    def __init__(self):
-
-        super().__init__(
-            base_url="https://mock.provider.local",
-        )
+class MockTravelProvider(TravelProvider):
 
     async def search(
         self,
