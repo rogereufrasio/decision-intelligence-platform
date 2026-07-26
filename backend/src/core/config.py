@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     app_environment: str = "development"
 
+    travel_provider: str = "mock"
+
+    amadeus_base_url: str = "https://test.api.amadeus.com"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
