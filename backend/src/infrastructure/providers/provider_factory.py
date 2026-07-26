@@ -1,4 +1,5 @@
 from src.domain.travel.provider import TravelProvider
+from src.infrastructure.providers.amadeus_provider import AmadeusProvider
 from src.infrastructure.providers.mock_provider import MockTravelProvider
 
 
