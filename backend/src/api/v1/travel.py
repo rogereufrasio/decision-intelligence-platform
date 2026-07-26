@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from src.application.travel.search_travel import SearchTravelUseCase
 from src.shared.models import (
     TravelSearchRequest,
     TravelSearchResponse,
@@ -10,6 +11,8 @@ router = APIRouter(
     tags=["Travel"],
 )
 
+use_case = SearchTravelUseCase()
+
 
 @router.post(
     "/search",
@@ -19,11 +22,10 @@ async def search(
     request: TravelSearchRequest,
 ) -> TravelSearchResponse:
 
+    result = await use_case.execute(request)
+
     return TravelSearchResponse(
-        provider="mock",
-        status="success",
-        message=(
-            f"Travel search received: "
-            f"{request.origin} -> {request.destination}"
-        ),
+        provider=result.provider,
+        status=result.status,
+        message=result.message,
     )
