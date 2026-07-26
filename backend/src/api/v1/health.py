@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from src.shared.responses import HealthResponse
+from src.shared.exceptions import DIPException
 
 router = APIRouter(prefix="/health", tags=["Health"])
 
@@ -14,4 +15,13 @@ async def health() -> HealthResponse:
         status="healthy",
         service="decision-intelligence-platform",
         version="0.1.0",
+    )
+
+@router.get("/error")
+async def error():
+
+    raise DIPException(
+        code="demo_error",
+        message="This is a test exception.",
+        status_code=400,
     )
