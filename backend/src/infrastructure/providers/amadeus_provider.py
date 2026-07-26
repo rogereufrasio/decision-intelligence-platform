@@ -1,5 +1,5 @@
 from src.core.config import get_settings
-from src.domain.travel.models import TravelResult
+from src.domain.travel.models import TravelOffer, TravelResult
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.providers.base_provider import BaseProvider
 from src.shared.models import TravelSearchRequest
@@ -65,6 +65,35 @@ class AmadeusProvider(
 
         return response.json()
 
+    def normalize_offers(
+        self,
+        data: dict,
+    ) -> list[TravelOffer]:
+
+        offers = []
+
+        for item in data.get("data", []):
+
+            price = item.get(
+                "price",
+                {},
+            )
+
+            offers.append(
+                TravelOffer(
+                    price=price.get(
+                        "grandTotal",
+                        "0",
+                    ),
+                    currency=price.get(
+                        "currency",
+                        "UNKNOWN",
+                    ),
+                )
+            )
+
+        return offers
+
     async def search(
         self,
         request: TravelSearchRequest,
@@ -77,16 +106,14 @@ class AmadeusProvider(
             token,
         )
 
-        offers_count = len(
-            data.get("data", [])
-        )
+        offers = self.normalize_offers(data)
 
         return TravelResult(
             provider="amadeus",
             status="success",
             message=(
                 f"Amadeus search completed: "
-                f"{request.origin} -> {request.destination}. "
-                f"Offers found: {offers_count}"
+                f"{request.origin} -> {request.destination}"
             ),
+            offers=offers,
         )

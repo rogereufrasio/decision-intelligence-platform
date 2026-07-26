@@ -7,13 +7,20 @@ from src.shared.models import TravelSearchRequest
 class TravelService:
 
     def __init__(self):
+
         settings = get_settings()
 
         provider = ProviderFactory.create(
             settings.travel_provider
         )
 
-        self.use_case = SearchTravelUseCase(provider)
+        self.use_case = SearchTravelUseCase(
+            provider
+        )
 
-    async def search(self, request: TravelSearchRequest):
+    async def search(
+        self,
+        request: TravelSearchRequest,
+    ):
+
         return await self.use_case.execute(request)

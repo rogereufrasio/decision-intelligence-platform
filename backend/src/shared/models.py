@@ -9,7 +9,13 @@ class TravelSearchRequest(BaseModel):
     adults: int = Field(default=1, ge=1)
 
 
+class TravelOfferResponse(BaseModel):
+    price: str
+    currency: str
+
+
 class TravelSearchResponse(BaseModel):
     provider: str
     status: str
     message: str
+    offers: list[TravelOfferResponse] = []

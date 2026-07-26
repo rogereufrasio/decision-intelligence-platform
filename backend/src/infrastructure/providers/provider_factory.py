@@ -7,14 +7,19 @@ class ProviderFactory:
     """
     Factory responsável pela criação dos providers de viagem.
 
-    Novos providers (Amadeus, Duffel etc.)
-    serão adicionados aqui futuramente.
+    Novos providers serão adicionados aqui.
     """
 
     @staticmethod
-    def create(provider_name: str) -> TravelProvider:
+    def create(
+        provider_name: str,
+    ) -> TravelProvider:
+
         if provider_name == "mock":
             return MockTravelProvider()
+
+        if provider_name == "amadeus":
+            return AmadeusProvider()
 
         raise ValueError(
             f"Unsupported travel provider: {provider_name}"
