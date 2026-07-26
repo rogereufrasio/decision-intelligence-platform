@@ -44,16 +44,49 @@ class AmadeusProvider(
 
         return data["access_token"]
 
+    async def search_flight_offers(
+        self,
+        request: TravelSearchRequest,
+        token: str,
+    ) -> dict:
+
+        response = await self.get(
+            "/v2/shopping/flight-offers",
+            params={
+                "originLocationCode": request.origin,
+                "destinationLocationCode": request.destination,
+                "departureDate": request.departure_date,
+                "adults": request.adults,
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+            },
+        )
+
+        return response.json()
+
     async def search(
         self,
         request: TravelSearchRequest,
     ) -> TravelResult:
 
+        token = await self.authenticate()
+
+        data = await self.search_flight_offers(
+            request,
+            token,
+        )
+
+        offers_count = len(
+            data.get("data", [])
+        )
+
         return TravelResult(
             provider="amadeus",
-            status="not_implemented",
+            status="success",
             message=(
-                f"Amadeus search pending: "
-                f"{request.origin} -> {request.destination}"
+                f"Amadeus search completed: "
+                f"{request.origin} -> {request.destination}. "
+                f"Offers found: {offers_count}"
             ),
         )
