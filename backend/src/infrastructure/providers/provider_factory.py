@@ -1,14 +1,20 @@
-from src.domain.travel.providers.base import TravelProvider
+from src.domain.travel.provider import TravelProvider
 from src.infrastructure.providers.mock_provider import MockTravelProvider
 
 
-def get_travel_provider() -> TravelProvider:
+class ProviderFactory:
     """
-    Centraliza a escolha do provider.
+    Factory responsável pela criação dos providers de viagem.
 
-    Enquanto o MVP utiliza apenas Mock,
-    futuras implementações (Amadeus, Duffel etc.)
-    serão adicionadas aqui.
+    Novos providers (Amadeus, Duffel etc.)
+    serão adicionados aqui futuramente.
     """
 
-    return MockTravelProvider()
+    @staticmethod
+    def create(provider_name: str) -> TravelProvider:
+        if provider_name == "mock":
+            return MockTravelProvider()
+
+        raise ValueError(
+            f"Unsupported travel provider: {provider_name}"
+        )

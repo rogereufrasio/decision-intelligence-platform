@@ -1,20 +1,24 @@
 from fastapi import APIRouter
 
-from src.application.travel.search_travel_use_case import SearchTravelUseCase
-from src.infrastructure.providers.mock_provider import MockTravelProvider
-from src.shared.models import TravelSearchRequest, TravelSearchResponse
+from src.application.travel.travel_service import TravelService
+from src.shared.models import (
+    TravelSearchRequest,
+    TravelSearchResponse,
+)
 
-router = APIRouter(prefix="/travel", tags=["Travel"])
+router = APIRouter(
+    prefix="/travel",
+    tags=["Travel"],
+)
+
+service = TravelService()
 
 
 @router.post(
     "/search",
     response_model=TravelSearchResponse,
 )
-async def search(request: TravelSearchRequest):
-
-    use_case = SearchTravelUseCase(
-        provider=MockTravelProvider(),
-    )
-
-    return await use_case.execute(request)
+async def search(
+    request: TravelSearchRequest,
+):
+    return await service.search(request)
