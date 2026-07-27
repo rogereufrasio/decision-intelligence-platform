@@ -12,12 +12,16 @@ class AmadeusAuthService:
     ):
         self.client = client
         self.base_url = base_url
+        self._token: AccessToken | None = None
 
     async def authenticate(
         self,
         client_id: str | None = None,
         client_secret: str | None = None,
     ) -> AccessToken:
+
+        if self._token and not self._token.is_expired():
+            return self._token
 
         if not client_id or not client_secret:
             settings = get_settings()
@@ -41,9 +45,11 @@ class AmadeusAuthService:
 
         data = response.json()
 
-        return AccessToken(
+        self._token = AccessToken(
             access_token=data["access_token"],
             expires_in=data.get(
                 "expires_in"
             ),
         )
+
+        return self._token
