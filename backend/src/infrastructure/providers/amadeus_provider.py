@@ -7,8 +7,6 @@ from src.domain.travel.provider import TravelProvider
 from src.domain.travel.auth import AccessToken
 from src.domain.travel.auth_provider import AuthProvider
 
-from src.core.config import get_settings
-
 from src.shared.models import TravelSearchRequest
 
 from src.infrastructure.providers.base_provider import (
@@ -40,11 +38,9 @@ class AmadeusProvider(
         auth_service: AmadeusAuthService | None = None,
     ):
 
-        settings = get_settings()
-
         super().__init__(
             client=client,
-            base_url=settings.amadeus_base_url,
+            base_url="https://test.api.amadeus.com",
         )
 
         self.auth_service = auth_service or AmadeusAuthService(
@@ -68,7 +64,9 @@ class AmadeusProvider(
             offers=[],
         )
 
-    async def authenticate(self) -> AccessToken:
+    async def authenticate(
+        self,
+    ) -> AccessToken:
 
         return await self.auth_service.authenticate()
 
