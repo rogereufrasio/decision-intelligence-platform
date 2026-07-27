@@ -19,4 +19,9 @@ class MockTravelProvider(
                 f"Travel search received: "
                 f"{request.origin} -> {request.destination}"
             ),
+            offers=[],
         )
+
+
+# Compatibilidade temporária
+MockProvider = MockTravelProvider
