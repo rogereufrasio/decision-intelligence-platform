@@ -9,14 +9,19 @@ class ProviderFactory:
     @staticmethod
     def create(
         provider_name: str,
+        client: HttpClient | None = None,
     ) -> TravelProvider:
 
         if provider_name == "mock":
             return MockTravelProvider()
 
         if provider_name == "amadeus":
+
+            if client is None:
+                client = HttpClient()
+
             return AmadeusProvider(
-                client=HttpClient()
+                client=client,
             )
 
         raise ValueError(
