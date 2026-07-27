@@ -23,8 +23,9 @@ class AmadeusProvider(
         self.client_secret = settings.amadeus_client_secret
 
         super().__init__(
+            client=client,
             base_url=settings.amadeus_base_url,
-        )
+)
 
     async def search(
         self,

@@ -1,22 +1,18 @@
 from typing import Any
 
-import httpx
+from src.infrastructure.http.client import HttpClient
 
 
 class BaseProvider:
 
     def __init__(
         self,
+        client: HttpClient,
         base_url: str,
-        timeout: int = 30,
     ):
 
+        self.client = client
         self.base_url = base_url.rstrip("/")
-
-        self.client = httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=timeout,
-        )
 
     async def get(
         self,
@@ -24,14 +20,10 @@ class BaseProvider:
         **kwargs: Any,
     ):
 
-        response = await self.client.get(
-            path,
+        return await self.client.get(
+            f"{self.base_url}{path}",
             **kwargs,
         )
-
-        response.raise_for_status()
-
-        return response
 
     async def post(
         self,
@@ -39,15 +31,7 @@ class BaseProvider:
         **kwargs: Any,
     ):
 
-        response = await self.client.post(
-            path,
+        return await self.client.post(
+            f"{self.base_url}{path}",
             **kwargs,
         )
-
-        response.raise_for_status()
-
-        return response
-
-    async def close(self):
-
-        await self.client.aclose()
