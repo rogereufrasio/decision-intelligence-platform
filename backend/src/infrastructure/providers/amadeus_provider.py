@@ -48,8 +48,27 @@ class AmadeusProvider(
                 "Amadeus credentials are not configured"
             )
 
+        response = await self.client.post(
+            "/v1/security/oauth2/token",
+            data={
+                "grant_type": "client_credentials",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+            },
+            headers={
+                "Content-Type": (
+                    "application/x-www-form-urlencoded"
+                ),
+            },
+        )
+
+        data = response.json()
+
         return {
-            "access_token": "mock-token"
+            "access_token": data["access_token"],
+            "expires_in": data.get(
+                "expires_in"
+            ),
         }
 
     def normalize_offers(

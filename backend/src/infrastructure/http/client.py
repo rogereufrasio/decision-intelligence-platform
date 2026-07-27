@@ -60,3 +60,8 @@ class HttpClient:
             raise HttpClientException(
                 str(exc)
             ) from exc
+
+
+    async def close(self):
+
+        await self.client.aclose()

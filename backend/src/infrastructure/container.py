@@ -18,3 +18,7 @@ class Container:
             provider_name=provider_name,
             client=self.http_client,
         )
+
+    async def close(self):
+
+        await self.http_client.close()
