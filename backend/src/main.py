@@ -3,7 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from src.api.router import api_router
-from src.core.http import http_client
+from src.infrastructure.container import Container
+
+
+container = Container()
 
 
 @asynccontextmanager
@@ -11,7 +14,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    await http_client.close()
+    await container.close()
 
 
 app = FastAPI(
