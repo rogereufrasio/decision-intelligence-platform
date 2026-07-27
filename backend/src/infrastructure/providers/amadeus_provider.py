@@ -17,10 +17,14 @@ class AmadeusProvider(
         client: HttpClient,
     ):
 
+        self.client = client
+
         settings = get_settings()
 
         self.client_id = settings.amadeus_client_id
         self.client_secret = settings.amadeus_client_secret
+
+        self.access_token: AccessToken | None = None
 
         super().__init__(
             client=client,
@@ -32,16 +36,42 @@ class AmadeusProvider(
         request: TravelSearchRequest,
     ) -> TravelResult:
 
+        token = await self.authenticate()
+
+        response = await self.client.get(
+            "/v2/shopping/flight-offers",
+            headers={
+                "Authorization": (
+                    f"Bearer {token.access_token}"
+                ),
+            },
+            params={
+                "originLocationCode": request.origin,
+                "destinationLocationCode": (
+                    request.destination
+                ),
+                "departureDate": (
+                    request.departure_date
+                ),
+                "adults": request.adults,
+            },
+        )
+
+        offers = self.normalize_offers(
+            response.json()
+        )
+
         return TravelResult(
             provider="amadeus",
-            status="not_implemented",
-            message=(
-                f"Amadeus search pending: "
-                f"{request.origin} -> {request.destination}"
-            ),
+            status="success",
+            message="Amadeus search completed",
+            offers=offers,
         )
 
     async def authenticate(self) -> AccessToken:
+
+        if self.access_token:
+            return self.access_token
 
         if not self.client_id or not self.client_secret:
             raise ValueError(
@@ -51,7 +81,9 @@ class AmadeusProvider(
         response = await self.client.post(
             "/v1/security/oauth2/token",
             data={
-                "grant_type": "client_credentials",
+                "grant_type": (
+                    "client_credentials"
+                ),
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
             },
@@ -64,12 +96,14 @@ class AmadeusProvider(
 
         data = response.json()
 
-        return AccessToken(
+        self.access_token = AccessToken(
             access_token=data["access_token"],
             expires_in=data.get(
                 "expires_in"
             ),
         )
+
+        return self.access_token
 
     def normalize_offers(
         self,
