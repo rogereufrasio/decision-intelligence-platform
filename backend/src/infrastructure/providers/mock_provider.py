@@ -23,5 +23,4 @@ class MockTravelProvider(
         )
 
 
-# Compatibilidade temporária
 MockProvider = MockTravelProvider

@@ -5,6 +5,7 @@ from src.domain.travel.models import (
 
 from src.domain.travel.provider import TravelProvider
 from src.domain.travel.auth import AccessToken
+from src.domain.travel.auth_provider import AuthProvider
 
 from src.core.config import get_settings
 
@@ -30,6 +31,7 @@ from src.infrastructure.providers.amadeus_mapper import (
 class AmadeusProvider(
     BaseProvider,
     TravelProvider,
+    AuthProvider,
 ):
 
     def __init__(
@@ -44,9 +46,6 @@ class AmadeusProvider(
             client=client,
             base_url=settings.amadeus_base_url,
         )
-
-        self.client_id = settings.amadeus_client_id
-        self.client_secret = settings.amadeus_client_secret
 
         self.auth_service = auth_service or AmadeusAuthService(
             client=client,
@@ -70,11 +69,6 @@ class AmadeusProvider(
         )
 
     async def authenticate(self) -> AccessToken:
-
-        if not self.client_id or not self.client_secret:
-            raise ValueError(
-                "Amadeus credentials are not configured"
-            )
 
         return await self.auth_service.authenticate()
 
