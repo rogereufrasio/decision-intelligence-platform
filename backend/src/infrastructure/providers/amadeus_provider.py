@@ -1,10 +1,11 @@
-from src.domain.travel.models import TravelOffer, TravelResult
+from src.domain.travel.models import TravelResult
 from src.domain.travel.auth import AccessToken
 from src.domain.travel.provider import TravelProvider
 from src.core.config import get_settings
 from src.shared.models import TravelSearchRequest
 from src.infrastructure.providers.base_provider import BaseProvider
 from src.infrastructure.http.client import HttpClient
+from src.infrastructure.providers.amadeus_mapper import AmadeusMapper
 
 
 class AmadeusProvider(
@@ -18,13 +19,12 @@ class AmadeusProvider(
     ):
 
         self.client = client
+        self.mapper = AmadeusMapper()
 
         settings = get_settings()
 
         self.client_id = settings.amadeus_client_id
         self.client_secret = settings.amadeus_client_secret
-
-        self.access_token: AccessToken | None = None
 
         super().__init__(
             client=client,
@@ -47,31 +47,24 @@ class AmadeusProvider(
             },
             params={
                 "originLocationCode": request.origin,
-                "destinationLocationCode": (
-                    request.destination
-                ),
-                "departureDate": (
-                    request.departure_date
-                ),
+                "destinationLocationCode": request.destination,
+                "departureDate": request.departure_date,
                 "adults": request.adults,
             },
         )
 
-        offers = self.normalize_offers(
+        offers = self.mapper.normalize_offers(
             response.json()
         )
 
         return TravelResult(
             provider="amadeus",
             status="success",
-            message="Amadeus search completed",
+            message="Flight search completed",
             offers=offers,
         )
 
     async def authenticate(self) -> AccessToken:
-
-        if self.access_token:
-            return self.access_token
 
         if not self.client_id or not self.client_secret:
             raise ValueError(
@@ -81,9 +74,7 @@ class AmadeusProvider(
         response = await self.client.post(
             "/v1/security/oauth2/token",
             data={
-                "grant_type": (
-                    "client_credentials"
-                ),
+                "grant_type": "client_credentials",
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
             },
@@ -96,40 +87,9 @@ class AmadeusProvider(
 
         data = response.json()
 
-        self.access_token = AccessToken(
+        return AccessToken(
             access_token=data["access_token"],
             expires_in=data.get(
                 "expires_in"
             ),
         )
-
-        return self.access_token
-
-    def normalize_offers(
-        self,
-        data: dict,
-    ) -> list[TravelOffer]:
-
-        offers = []
-
-        for item in data.get("data", []):
-
-            price = item.get(
-                "price",
-                {},
-            )
-
-            offers.append(
-                TravelOffer(
-                    price=price.get(
-                        "grandTotal",
-                        "0.00",
-                    ),
-                    currency=price.get(
-                        "currency",
-                        "BRL",
-                    ),
-                )
-            )
-
-        return offers
