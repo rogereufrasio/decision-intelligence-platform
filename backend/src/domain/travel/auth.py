@@ -1,12 +1,14 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AccessToken(BaseModel):
     access_token: str
     expires_in: int | None = None
-    created_at: datetime = datetime.utcnow()
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC)
+    )
 
     def is_expired(
         self,
@@ -17,7 +19,7 @@ class AccessToken(BaseModel):
             return False
 
         elapsed = (
-            datetime.utcnow() - self.created_at
+            datetime.now(UTC) - self.created_at
         ).total_seconds()
 
         return elapsed >= (

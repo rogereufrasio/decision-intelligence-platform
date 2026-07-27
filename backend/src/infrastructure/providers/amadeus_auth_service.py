@@ -1,6 +1,7 @@
 from src.core.config import get_settings
 from src.domain.travel.auth import AccessToken
 from src.infrastructure.http.client import HttpClient
+from src.infrastructure.http.exceptions import HttpClientException
 
 
 class AmadeusAuthService:
@@ -34,16 +35,29 @@ class AmadeusAuthService:
                 "Amadeus credentials are not configured"
             )
 
-        response = await self.client.post(
-            f"{self.base_url}/v1/security/oauth2/token",
-            data={
-                "grant_type": "client_credentials",
-                "client_id": client_id,
-                "client_secret": client_secret,
-            },
-        )
+        try:
+
+            response = await self.client.post(
+                f"{self.base_url}/v1/security/oauth2/token",
+                data={
+                    "grant_type": "client_credentials",
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                },
+            )
+
+        except HttpClientException as exc:
+
+            raise ValueError(
+                f"Amadeus authentication failed: {exc}"
+            ) from exc
 
         data = response.json()
+
+        if "access_token" not in data:
+            raise ValueError(
+                "Invalid Amadeus authentication response"
+            )
 
         self._token = AccessToken(
             access_token=data["access_token"],
