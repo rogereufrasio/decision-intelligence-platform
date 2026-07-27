@@ -1,4 +1,5 @@
 from src.domain.travel.models import TravelOffer, TravelResult
+from src.domain.travel.auth import AccessToken
 from src.domain.travel.provider import TravelProvider
 from src.core.config import get_settings
 from src.shared.models import TravelSearchRequest
@@ -12,11 +13,10 @@ class AmadeusProvider(
 ):
 
     def __init__(
-            self,
-            client: HttpClient,
-            ):
+        self,
+        client: HttpClient,
+    ):
 
-        self.client = client
         settings = get_settings()
 
         self.client_id = settings.amadeus_client_id
@@ -25,7 +25,7 @@ class AmadeusProvider(
         super().__init__(
             client=client,
             base_url=settings.amadeus_base_url,
-)
+        )
 
     async def search(
         self,
@@ -41,7 +41,7 @@ class AmadeusProvider(
             ),
         )
 
-    async def authenticate(self):
+    async def authenticate(self) -> AccessToken:
 
         if not self.client_id or not self.client_secret:
             raise ValueError(
@@ -64,12 +64,12 @@ class AmadeusProvider(
 
         data = response.json()
 
-        return {
-            "access_token": data["access_token"],
-            "expires_in": data.get(
+        return AccessToken(
+            access_token=data["access_token"],
+            expires_in=data.get(
                 "expires_in"
             ),
-        }
+        )
 
     def normalize_offers(
         self,
