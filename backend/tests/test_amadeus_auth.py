@@ -49,7 +49,7 @@ async def test_amadeus_authentication_returns_token(
 
 
     monkeypatch.setattr(
-        provider.client,
+        provider.auth_service.client,
         "post",
         fake_post,
     )
