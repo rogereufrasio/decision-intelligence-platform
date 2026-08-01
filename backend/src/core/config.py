@@ -5,21 +5,33 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
 
-    app_name: str = "Decision Intelligence Platform API"
+    app_name: str = (
+        "Decision Intelligence Platform API"
+    )
+
     app_version: str = "0.1.0"
-    app_environment: str = "development"
+
+    app_environment: str = (
+        "development"
+    )
 
     travel_provider: str = "mock"
 
-    amadeus_base_url: str = "https://test.api.amadeus.com"
+    amadeus_base_url: str = (
+        "https://test.api.amadeus.com"
+    )
+
     amadeus_client_id: str | None = None
+
     amadeus_client_secret: str | None = None
 
     http_timeout_seconds: int = 30
 
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        case_sensitive=False,
         extra="ignore",
     )
 

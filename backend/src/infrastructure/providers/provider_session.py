@@ -1,25 +1,44 @@
+from abc import ABC
 from typing import Any
 
 from src.infrastructure.http.client import HttpClient
 
 
-class BaseProvider:
+class ProviderSession(ABC):
 
     def __init__(
         self,
         client: HttpClient,
         base_url: str,
     ):
-
         self.client = client
-        self.base_url = base_url.rstrip("/")
+        self.base_url = base_url
 
     @property
-    def provider_name(
+    def default_headers(
         self,
-    ) -> str:
+    ) -> dict[str, str]:
 
-        return self.__class__.__name__
+        return {
+            "Accept": "application/json",
+        }
+
+    async def build_headers(
+        self,
+        **headers: str,
+    ) -> dict[str, str]:
+
+        merged = self.default_headers.copy()
+
+        merged.update(
+            {
+                key: value
+                for key, value in headers.items()
+                if value is not None
+            }
+        )
+
+        return merged
 
     async def get(
         self,
@@ -29,7 +48,6 @@ class BaseProvider:
 
         return await self.client.get(
             f"{self.base_url}{path}",
-            provider=self.provider_name,
             **kwargs,
         )
 
@@ -41,6 +59,5 @@ class BaseProvider:
 
         return await self.client.post(
             f"{self.base_url}{path}",
-            provider=self.provider_name,
             **kwargs,
         )
