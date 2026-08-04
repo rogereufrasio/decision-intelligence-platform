@@ -10,8 +10,15 @@ async def test_travel_service():
 
     provider = MockTravelProvider()
 
+    class SimpleOrchestrator:
+        def __init__(self, provider):
+            self._provider = provider
+
+        async def search(self, request):
+            return await self._provider.search(request)
+
     service = TravelService(
-        provider=provider,
+        orchestrator=SimpleOrchestrator(provider),
     )
 
     result = await service.search(

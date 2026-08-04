@@ -25,6 +25,12 @@ class Settings(BaseSettings):
 
     amadeus_client_secret: str | None = None
 
+    duffel_base_url: str = (
+        "https://api.duffel.com"
+    )
+
+    duffel_api_key: str | None = None
+
     http_timeout_seconds: int = 30
 
 

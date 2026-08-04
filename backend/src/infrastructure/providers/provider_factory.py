@@ -9,6 +9,9 @@ from src.infrastructure.providers.amadeus_provider import (
 from src.infrastructure.providers.mock_provider import (
     MockProvider,
 )
+from src.infrastructure.providers.duffel_provider import (
+    DuffelProvider,
+)
 from src.infrastructure.providers.provider_registry import (
     ProviderNotFoundError,
     ProviderRegistry,
@@ -33,10 +36,19 @@ class ProviderFactory:
         def create_mock(client: HttpClient | None = None) -> TravelProvider:
             return MockProvider()
 
+        def create_duffel(client: HttpClient | None = None) -> TravelProvider:
+            if client is None:
+                client = HttpClient()
+            return DuffelProvider(
+                client=client,
+            )
+
         if "amadeus" not in available:
             ProviderRegistry.register("amadeus", create_amadeus)
         if "mock" not in available:
             ProviderRegistry.register("mock", create_mock)
+        if "duffel" not in available:
+            ProviderRegistry.register("duffel", create_duffel)
 
     @staticmethod
     def create(
