@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import httpx
 import pytest
 
@@ -73,7 +75,7 @@ async def test_duffel_provider_search_success(monkeypatch):
     assert result.status == "success"
     assert result.message == "Offers retrieved successfully"
     assert len(result.offers) == 1
-    assert result.offers[0].price == "300.00"
+    assert result.offers[0].price == Decimal("300.00")
     assert result.offers[0].currency == "BRL"
 
 

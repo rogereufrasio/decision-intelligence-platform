@@ -21,5 +21,5 @@ def test_normalize_amadeus_response():
     )
 
     assert len(offers) == 1
-    assert offers[0].price == "450.00"
+    assert str(offers[0].price) == "450.00"
     assert offers[0].currency == "BRL"

@@ -68,7 +68,7 @@ async def search_flights(
         FlightOffer(
             id=str(index + 1),
             provider=result.provider,
-            total_amount=offer.price,
+            total_amount=str(offer.price),
             currency=offer.currency,
             total_duration_minutes=0,
             slices=[],

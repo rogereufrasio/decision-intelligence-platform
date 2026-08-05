@@ -1,5 +1,5 @@
 import pytest
-from src.domain.travel.models import TravelOffer, TravelResult
+from src.domain.models import Offer, TravelResult
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.providers.provider_strategy import ProviderStrategy
 from src.infrastructure.providers.provider_registry import ProviderRegistry
@@ -15,7 +15,9 @@ def setup_test_providers():
                 status="success",
                 message="OK",
                 offers=[
-                    TravelOffer(
+                    Offer(
+                        provider="dummy1",
+                        product_type="flight",
                         price="100.0",
                         currency="BRL",
                     )
@@ -29,7 +31,9 @@ def setup_test_providers():
                 status="success",
                 message="OK",
                 offers=[
-                    TravelOffer(
+                    Offer(
+                        provider="dummy2",
+                        product_type="flight",
                         price="200.0",
                         currency="BRL",
                     )
@@ -43,23 +47,40 @@ def setup_test_providers():
 
     ProviderRegistry.unregister_all()
 
+
 @pytest.mark.asyncio
 async def test_strategy_executes_single_provider():
-    strategy = ProviderStrategy(provider_names=["dummy1"])
-    results = await strategy.search("GIG", "GRU", "2026-10-01")
+    request = TravelSearchRequest(
+        origin="GIG",
+        destination="GRU",
+        departure_date="2026-10-01",
+        return_date=None,
+        adults=1,
+    )
 
-    assert len(results) == 1
-    assert results[0].price == "100.0"
-    assert results[0].currency == "BRL"
+    strategy = ProviderStrategy(provider_names=["dummy1"])
+    result = await strategy.search(request)
+
+    assert len(result.offers) == 1
+    assert str(result.offers[0].price) == "100.0"
+    assert result.offers[0].currency == "BRL"
 
 
 @pytest.mark.asyncio
 async def test_strategy_executes_multiple_providers():
-    strategy = ProviderStrategy(provider_names=["dummy1", "dummy2"])
-    results = await strategy.search("GIG", "GRU", "2026-10-01")
+    request = TravelSearchRequest(
+        origin="GIG",
+        destination="GRU",
+        departure_date="2026-10-01",
+        return_date=None,
+        adults=1,
+    )
 
-    assert len(results) == 2
-    prices_found = {offer.price for offer in results}
+    strategy = ProviderStrategy(provider_names=["dummy1", "dummy2"])
+    result = await strategy.search(request)
+
+    assert len(result.offers) == 2
+    prices_found = {str(offer.price) for offer in result.offers}
     assert prices_found == {"100.0", "200.0"}
 
 
@@ -71,10 +92,18 @@ async def test_strategy_handles_provider_failure_gracefully():
 
     ProviderRegistry.register("failing", lambda client=None: FailingProvider())
 
+    request = TravelSearchRequest(
+        origin="GIG",
+        destination="GRU",
+        departure_date="2026-10-01",
+        return_date=None,
+        adults=1,
+    )
+
     strategy = ProviderStrategy(provider_names=["dummy1", "failing"])
-    results = await strategy.search("GIG", "GRU", "2026-10-01")
+    result = await strategy.search(request)
 
     # Deve retornar os resultados do provider funcional mesmo com a falha do outro
-    assert len(results) == 1
-    assert results[0].price == "100.0"
-    assert results[0].currency == "BRL"
+    assert len(result.offers) == 1
+    assert str(result.offers[0].price) == "100.0"
+    assert result.offers[0].currency == "BRL"

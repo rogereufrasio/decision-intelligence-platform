@@ -1,11 +1,7 @@
 import pytest
 
 from src.domain.entities.decision import SortCriterion
-from src.domain.entities.flight import (
-    FlightOffer,
-    FlightSlice,
-    FlightSegment,
-)
+from src.domain.models import Offer
 from src.domain.services.decision_engine import DecisionEngine
 
 
@@ -16,36 +12,41 @@ def create_offer(
     origin: str = "GIG",
     destination: str = "GRU",
     flight_number: str | None = None,
-) -> FlightOffer:
+) -> Offer:
     if flight_number is None:
         flight_number = f"AB{offer_id}"
 
-    return FlightOffer(
-        id=offer_id,
+    return Offer(
         provider="test",
-        total_amount=price,
+        product_type="flight",
+        price=price,
         currency="BRL",
-        total_duration_minutes=duration,
-        slices=[
-            FlightSlice(
-                origin=origin,
-                destination=destination,
-                departure_date="2026-10-01T10:00:00+00:00",
-                arrival_date="2026-10-01T12:00:00+00:00",
-                duration_minutes=duration,
-                segments=[
-                    FlightSegment(
-                        origin=origin,
-                        destination=destination,
-                        departure_time="2026-10-01T10:00:00+00:00",
-                        arrival_time="2026-10-01T12:00:00+00:00",
-                        duration_minutes=duration,
-                        carrier="LA",
-                        flight_number=flight_number,
-                    )
-                ],
-            )
-        ],
+        metadata={
+            "id": offer_id,
+        },
+        attributes={
+            "total_duration_minutes": duration,
+            "slices": [
+                {
+                    "origin": origin,
+                    "destination": destination,
+                    "departure_date": "2026-10-01T10:00:00+00:00",
+                    "arrival_date": "2026-10-01T12:00:00+00:00",
+                    "duration_minutes": duration,
+                    "segments": [
+                        {
+                            "origin": origin,
+                            "destination": destination,
+                            "departure_time": "2026-10-01T10:00:00+00:00",
+                            "arrival_time": "2026-10-01T12:00:00+00:00",
+                            "duration_minutes": duration,
+                            "carrier": "LA",
+                            "flight_number": flight_number,
+                        }
+                    ],
+                }
+            ],
+        },
     )
 
 
@@ -60,8 +61,8 @@ def test_rank_offers_by_cheapest():
         SortCriterion.CHEAPEST,
     )
 
-    assert ranked[0].id == "2"
-    assert ranked[1].id == "1"
+    assert ranked[0].metadata["id"] == "2"
+    assert ranked[1].metadata["id"] == "1"
 
 
 def test_rank_offers_by_fastest():
@@ -75,8 +76,8 @@ def test_rank_offers_by_fastest():
         SortCriterion.FASTEST,
     )
 
-    assert ranked[0].id == "2"
-    assert ranked[1].id == "1"
+    assert ranked[0].metadata["id"] == "2"
+    assert ranked[1].metadata["id"] == "1"
 
 
 def test_rank_offers_by_best_value():
@@ -90,8 +91,8 @@ def test_rank_offers_by_best_value():
         SortCriterion.BEST_VALUE,
     )
 
-    assert ranked[0].id == "1"
-    assert ranked[1].id == "2"
+    assert ranked[0].metadata["id"] == "1"
+    assert ranked[1].metadata["id"] == "2"
 
 
 def test_deduplicate_offers_chooses_cheapest():
@@ -100,8 +101,10 @@ def test_deduplicate_offers_chooses_cheapest():
         create_offer("2", "150.00", 180, flight_number="AB1"),
     ]
 
-    offers[1].slices[0].departure_date = offers[0].slices[0].departure_date
-    offers[1].slices[0].arrival_date = offers[0].slices[0].arrival_date
+    first_slice = offers[0].attributes["slices"][0]
+    second_slice = offers[1].attributes["slices"][0]
+    second_slice["departure_date"] = first_slice["departure_date"]
+    second_slice["arrival_date"] = first_slice["arrival_date"]
 
     ranked = DecisionEngine.rank_offers(
         offers,
@@ -109,4 +112,4 @@ def test_deduplicate_offers_chooses_cheapest():
     )
 
     assert len(ranked) == 1
-    assert ranked[0].id == "2"
+    assert ranked[0].metadata["id"] == "2"

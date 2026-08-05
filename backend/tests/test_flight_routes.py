@@ -13,6 +13,7 @@ def make_offer(offer_id: str) -> TravelOffer:
     return TravelOffer(
         id=offer_id,
         provider="mock",
+        product_type="flight",
         price="150.00",
         currency="USD",
         cabin_class="economy",
@@ -53,7 +54,6 @@ def test_search_flights_success():
     assert body["total_results"] == 1
     assert body["applied_criterion"] == "best_value"
     assert isinstance(body["offers"], list)
-    # Valida pelo ID ou ajuste para o nome exato da chave no schema (ex: total_price)
     assert body["offers"][0]["id"] == "1"
 
 
@@ -106,7 +106,7 @@ def test_search_flights_with_sorting():
                 "departure_date": "2026-09-03",
                 "return_date": "2026-09-07",
                 "passengers": 1,
-                "sort_by": "best_value",  # <- Use um enum válido
+                "sort_by": "best_value",
             },
         )
     finally:

@@ -1,5 +1,5 @@
 from src.core.config import get_settings
-from src.domain.travel.auth import AccessToken
+from src.domain.travel.models import TravelOffer, TravelResult
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.http.client import HttpClient
 from src.infrastructure.providers.amadeus_auth_service import (
@@ -14,10 +14,7 @@ from src.infrastructure.providers.amadeus_session import (
 from src.infrastructure.providers.base_provider import (
     BaseProvider,
 )
-from src.shared.models import (
-    TravelSearchRequest,
-    TravelSearchResponse,
-)
+from src.shared.models import TravelSearchRequest
 
 
 class AmadeusProvider(
@@ -64,7 +61,7 @@ class AmadeusProvider(
     async def search(
         self,
         request: TravelSearchRequest,
-    ) -> TravelSearchResponse:
+    ) -> TravelResult:
 
         response = await self.session.get(
             "/v2/shopping/flight-offers",
@@ -81,7 +78,7 @@ class AmadeusProvider(
             response.json(),
         )
 
-        return TravelSearchResponse(
+        return TravelResult(
             provider="amadeus",
             status="success",
             message="Offers retrieved successfully",

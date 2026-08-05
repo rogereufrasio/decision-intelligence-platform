@@ -114,6 +114,8 @@ class DuffelProvider(
                     if price and currency:
                         offers.append(
                             TravelOffer(
+                                provider="duffel",
+                                product_type="flight",
                                 price=str(price),
                                 currency=str(currency),
                             )
@@ -127,6 +129,8 @@ class DuffelProvider(
                 if price and currency:
                     offers.append(
                         TravelOffer(
+                            provider="duffel",
+                            product_type="flight",
                             price=str(price),
                             currency=str(currency),
                         )
