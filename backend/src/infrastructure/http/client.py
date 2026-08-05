@@ -151,5 +151,6 @@ class HttpClient:
         )
 
     async def close(self):
-
+        if self.client.is_closed:
+            return
         await self.client.aclose()

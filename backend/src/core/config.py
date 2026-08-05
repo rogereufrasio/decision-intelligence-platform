@@ -35,6 +35,12 @@ class Settings(BaseSettings):
 
     metrics_enabled: bool = True
 
+    security_headers_enabled: bool = True
+
+    readiness_enabled: bool = True
+
+    external_dependency_check_enabled: bool = False
+
     amadeus_base_url: str = (
         "https://test.api.amadeus.com"
     )

@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from src.api.router import api_router
 from src.api.middleware.correlation_id import CorrelationIdMiddleware
 from src.api.middleware.request_logging import RequestLoggingMiddleware
+from src.api.middleware.security_headers import SecurityHeadersMiddleware
 from src.core.config import get_settings
 from src.core.metrics import metrics_collector
 from src.infrastructure.container import Container
@@ -36,6 +37,10 @@ app.add_middleware(
     metrics_enabled=settings.metrics_enabled,
 )
 app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(
+    SecurityHeadersMiddleware,
+    enabled=settings.security_headers_enabled,
+)
 
 
 @app.exception_handler(RequestValidationError)

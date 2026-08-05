@@ -28,6 +28,7 @@ from src.application.travel.recommend_travel_offers import (
 from src.application.travel.search_orchestrator import SearchOrchestrator
 from src.application.travel.save_decision_snapshot import SaveDecisionSnapshotUseCase
 from src.core.config import Settings, get_settings
+from src.core.readiness import ReadinessService
 from src.domain.services.decision_engine import DecisionEngine
 from src.domain.services import AIPromptBuilder
 from src.domain.services.price_intelligence_engine import (
@@ -79,6 +80,12 @@ class Container:
 
         return DuckDBSearchRepository(
             self.settings.search_database_path,
+        )
+
+    def get_readiness_service(self) -> ReadinessService:
+        return ReadinessService(
+            settings=self.settings,
+            http_client=self.http_client,
         )
 
     def get_ai_assistant(self) -> AIAssistant | None:
