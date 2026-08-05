@@ -17,6 +17,12 @@ class Settings(BaseSettings):
 
     travel_provider: str = "mock"
 
+    search_persistence_enabled: bool = False
+
+    search_database_path: str = (
+        "../data/searches.duckdb"
+    )
+
     amadeus_base_url: str = (
         "https://test.api.amadeus.com"
     )

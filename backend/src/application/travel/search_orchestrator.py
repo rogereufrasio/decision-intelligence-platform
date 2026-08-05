@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from src.application.ports import SearchRepository
+from src.application.services.search_snapshot_factory import (
+    SearchSnapshotFactory,
+)
 from src.domain.entities.decision import SortCriterion
 from src.domain.models import TravelResult
 from src.domain.services.decision_engine import DecisionEngine
@@ -20,9 +24,11 @@ class SearchOrchestrator:
         self,
         provider_strategy: ProviderStrategy,
         decision_engine: DecisionEngine,
+        search_repository: SearchRepository | None = None,
     ) -> None:
         self.provider_strategy = provider_strategy
         self.decision_engine = decision_engine
+        self.search_repository = search_repository
 
     async def search(
         self,
@@ -34,4 +40,13 @@ class SearchOrchestrator:
             result.offers,
             criterion,
         )
+
+        if self.search_repository is not None:
+            snapshot = SearchSnapshotFactory.create(
+                request=request,
+                result=result,
+                sort_criterion=criterion,
+            )
+            await self.search_repository.save(snapshot)
+
         return result
