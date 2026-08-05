@@ -33,3 +33,10 @@ test('exibe página 404', () => {
   window.history.pushState({}, '', '/nao-existe'); render(<App />)
   expect(screen.getByRole('heading', { name: 'Página não encontrada' })).toBeInTheDocument()
 })
+
+test('navega para o estado informativo de IA assistiva', async () => {
+  const user = userEvent.setup(); render(<App />)
+  await user.click(screen.getByRole('link', { name: 'IA assistiva' }))
+  expect(screen.getByRole('heading', { name: 'IA assistiva' })).toBeInTheDocument()
+  expect(screen.getByText(/Nenhuma explicação é fabricada/)).toBeInTheDocument()
+})

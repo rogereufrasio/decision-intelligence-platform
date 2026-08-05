@@ -98,3 +98,14 @@ The MVP does not include authentication, rate limiting, distributed metrics,
 distributed tracing, managed persistence, production secret management, or a
 real generative-AI adapter. Third-party TestClient deprecation warnings are
 accepted until a safe upstream migration is planned.
+
+## Integration with the v1.1 web product
+
+The React frontend runs on port `5173` and the API on `8000`. Configure allowed
+origins with `CORS_ALLOWED_ORIGINS`; wildcard origins and browser credentials are
+not enabled. Search provider selection uses `X-Travel-Provider`, while Amadeus
+and Duffel secrets remain server-side. The local template AI adapter is optional
+and does not perform an LLM or external HTTP call.
+
+Run backend validation with `uv run pytest` and `uv run ruff check src tests`.
+The root scripts start the integrated product and execute isolated Chromium E2E.

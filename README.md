@@ -40,10 +40,11 @@ uv run ruff check src tests
 See [backend/README.md](backend/README.md) for configuration, endpoints,
 persistence and operational details.
 
-## Frontend v1.1
+## Product v1.1.0
 
 O shell web em React/Vite está disponível em `frontend/`, com navegação
-responsiva, design system mínimo e monitoramento inicial de health/readiness.
+responsiva, busca, recomendações, dashboard, histórico, inteligência de preços,
+comparações, decisões e exportação Parquet.
 
 ```powershell
 cd frontend
@@ -96,3 +97,6 @@ credentials and production deployment controls remain environment-specific.
 
 Operational acceptance is documented in
 [DIP-013 MVP Operational Readiness](docs/product/DIP-013-mvp-operational-readiness.md).
+O escopo do produto v1.1 está em
+[DIP-014 Product MVP v1.1](docs/product/DIP-014-product-mvp-v1.1.md), e as
+mudanças da release em [CHANGELOG.md](CHANGELOG.md).

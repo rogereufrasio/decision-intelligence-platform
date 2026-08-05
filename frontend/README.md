@@ -55,3 +55,24 @@ backend. `mock` permanece como opção segura quando nenhuma preferência existe
 Snapshots podem ser baixados em Parquet pelo Histórico e pelas Comparações. O
 download usa o conteúdo binário e o nome indicado em `Content-Disposition`, sem
 interpretar ou converter o arquivo no navegador.
+
+## Fluxo do produto e testes
+
+Use Configurações para escolher um provider local, realize a busca, consulte a
+recomendação e acompanhe snapshots no Histórico. Duas buscas persistidas podem
+ser comparadas, e seus snapshots podem ser baixados em Parquet. Decisões e IA
+assistiva refletem apenas capacidades realmente expostas pelo backend.
+
+```powershell
+npm run lint
+npm run test -- --run
+npm run build
+npm run test:e2e
+```
+
+O E2E inicia frontend e backend automaticamente, usa Chromium, provider mock e
+bancos descartáveis em `.tmp/`. Instale o navegador uma vez com
+`npx playwright install chromium`.
+
+Limitações: não há autenticação, armazenamento de credenciais, editor de
+contexto para IA ou gráficos fabricados sem série temporal.

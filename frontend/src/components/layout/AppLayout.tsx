@@ -4,7 +4,7 @@ import { Button } from '../ui/Button'
 
 const navigation = [
   ['/', 'Dashboard'], ['/buscar', 'Buscar viagem'], ['/historico', 'Histórico'],
-  ['/comparacoes', 'Comparações'], ['/decisoes', 'Decisões'], ['/configuracoes', 'Configurações'],
+  ['/comparacoes', 'Comparações'], ['/decisoes', 'Decisões'], ['/ia-assistiva', 'IA assistiva'], ['/configuracoes', 'Configurações'],
 ] as const
 
 function Navigation({ onNavigate }: { onNavigate?: () => void }) {
