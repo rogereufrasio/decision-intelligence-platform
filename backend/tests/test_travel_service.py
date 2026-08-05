@@ -14,7 +14,7 @@ async def test_travel_service():
         def __init__(self, provider):
             self._provider = provider
 
-        async def search(self, request):
+        async def search(self, request, criterion=None):
             return await self._provider.search(request)
 
     service = TravelService(

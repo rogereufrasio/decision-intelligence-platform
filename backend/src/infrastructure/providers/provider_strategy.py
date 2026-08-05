@@ -1,6 +1,7 @@
 import logging
-from typing import List, Sequence
-from src.domain.travel.models import TravelOffer, TravelResult
+from collections.abc import Sequence
+
+from src.domain.models import Offer, TravelResult
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.providers.provider_factory import ProviderFactory
 from src.shared.models import TravelSearchRequest
@@ -10,53 +11,91 @@ logger = logging.getLogger(__name__)
 
 class ProviderStrategy:
     """
-    Estratégia de execução para múltiplos providers de viagem.
-    Responsável por orquestrar as chamadas de busca entre os providers registrados.
+    Estratégia de execução para múltiplos providers.
     """
 
     def __init__(self, provider_names: Sequence[str] | None = None):
-        """
-        Se nenhum provider for especificado, utiliza 'amadeus' por padrão (ou os ativos).
-        """
-        self.provider_names = list(provider_names) if provider_names else ["amadeus"]
+        if provider_names:
+            self.provider_names = list(provider_names)
+        else:
+            self.provider_names = ["mock"]
 
-    def _get_providers(self) -> List[TravelProvider]:
-        """Instancia os providers solicitados via ProviderFactory."""
-        providers: List[TravelProvider] = []
+    def _get_providers(self) -> list[TravelProvider]:
+        providers: list[TravelProvider] = []
+
         for name in self.provider_names:
             try:
                 providers.append(ProviderFactory.create(name))
-            except Exception as e:
-                logger.error(f"Erro ao instanciar provider '{name}': {e}")
+            except Exception as exc:
+                logger.error(
+                    "Erro ao instanciar provider '%s': %s",
+                    name,
+                    exc,
+                )
+
         return providers
 
-    async def search(
-        self,
-        origin: str,
-        destination: str,
-        departure_date: str,
-        return_date: str | None = None,
-        adults: int = 1,
-    ) -> List[TravelOffer]:
-        """
-        Executa a busca de ofertas em todos os providers configurados de forma sequencial.
-        Coleta e unifica os resultados, isolando falhas individuais.
-        """
-        offers: List[TravelOffer] = []
+    async def search(self, request: TravelSearchRequest) -> TravelResult:
         providers = self._get_providers()
-        request = TravelSearchRequest(
-            origin=origin,
-            destination=destination,
-            departure_date=departure_date,
-            return_date=return_date,
-            adults=adults,
-        )
+
+        offers: list[Offer] = []
+        warnings: list[str] = []
+
+        last_result: TravelResult | None = None
 
         for provider in providers:
             try:
-                results: TravelResult = await provider.search(request)
-                offers.extend(results.offers)
-            except Exception as e:
-                logger.error(f"Falha na busca do provider '{provider}': {e}")
+                result = await provider.search(request)
+                last_result = result
 
-        return offers
+                if result.status != "success":
+                    warnings.append(
+                        f"Provider {provider.__class__.__name__} returned "
+                        f"status '{result.status}': {result.message}"
+                    )
+
+                offers.extend(result.offers)
+
+            except Exception as exc:
+                logger.error(
+                    "Falha na busca do provider '%s': %s",
+                    provider,
+                    exc,
+                )
+                warnings.append(
+                    f"Provider {provider.__class__.__name__} failed: {exc}"
+                )
+
+        # Apenas um provider: preserva exatamente a resposta dele.
+        if len(providers) == 1 and last_result is not None:
+            return TravelResult(
+                provider=self.provider_names[0],
+                status=last_result.status,
+                message=last_result.message,
+                offers=offers,
+                warnings=warnings,
+            )
+
+        # Múltiplos providers
+        if not offers and warnings:
+            logger.error("Search failed for all providers")
+            status = "error"
+            message = "; ".join(warnings)
+        elif warnings:
+            logger.warning(
+                "Search completed with warnings: %s",
+                "; ".join(warnings),
+            )
+            status = "success"
+            message = "Offers retrieved with warnings"
+        else:
+            status = "success"
+            message = "Offers retrieved successfully"
+
+        return TravelResult(
+            provider="aggregated",
+            status=status,
+            message=message,
+            offers=offers,
+            warnings=warnings,
+        )

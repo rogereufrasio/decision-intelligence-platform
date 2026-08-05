@@ -1,24 +1,17 @@
 from src.application.travel.search_orchestrator import SearchOrchestrator
-from src.core.config import get_settings
-from src.infrastructure.container import Container
+from src.domain.entities.decision import SortCriterion
+from src.domain.models import TravelResult
 from src.shared.models import TravelSearchRequest
 
 
 class TravelService:
 
-    def __init__(self, orchestrator: SearchOrchestrator | None = None):
-        if orchestrator is not None:
-            self.orchestrator = orchestrator
-            return
-
-        settings = get_settings()
-        container = Container()
-        # Container is responsible for wiring ProviderStrategy and DecisionEngine into the orchestrator
-        self.orchestrator = container.get_search_orchestrator()
+    def __init__(self, orchestrator: SearchOrchestrator) -> None:
+        self.orchestrator = orchestrator
 
     async def search(
         self,
         request: TravelSearchRequest,
-    ):
-
-        return await self.orchestrator.search(request)
+        criterion: SortCriterion | None = None,
+    ) -> TravelResult:
+        return await self.orchestrator.search(request, criterion)

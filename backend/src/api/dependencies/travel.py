@@ -1,16 +1,13 @@
 from src.application.travel.travel_service import TravelService
-from src.application.dependencies.travel_dependencies import (
-    get_travel_provider,
-)
+from src.infrastructure.container import Container
 
 
 def get_travel_service() -> TravelService:
     """
-    Cria o serviço de viagem com suas dependências.
+    Cria o serviço de viagem.
     """
 
-    provider = get_travel_provider()
-
+    container = Container()
     return TravelService(
-        provider=provider,
+        orchestrator=container.get_search_orchestrator(),
     )
