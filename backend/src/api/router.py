@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from src.api.v1.ai_explanations import router as ai_explanations_router
 from src.api.v1.decision_history import router as decision_history_router
 from src.api.v1.health import router as health_router
+from src.api.v1.metrics import router as metrics_router
 from src.api.v1.flights import router as flights_router
 from src.api.v1.price_intelligence import router as price_intelligence_router
 from src.api.v1.recommendations import router as recommendations_router
@@ -23,3 +24,4 @@ api_router.include_router(recommendations_router)
 api_router.include_router(price_intelligence_router)
 api_router.include_router(decision_history_router)
 api_router.include_router(ai_explanations_router)
+api_router.include_router(metrics_router)

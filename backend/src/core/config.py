@@ -31,6 +31,10 @@ class Settings(BaseSettings):
 
     ai_assistant_provider: str = "template"
 
+    observability_enabled: bool = True
+
+    metrics_enabled: bool = True
+
     amadeus_base_url: str = (
         "https://test.api.amadeus.com"
     )

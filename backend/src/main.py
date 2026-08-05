@@ -5,6 +5,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from src.api.router import api_router
+from src.api.middleware.correlation_id import CorrelationIdMiddleware
+from src.api.middleware.request_logging import RequestLoggingMiddleware
+from src.core.config import get_settings
+from src.core.metrics import metrics_collector
 from src.infrastructure.container import Container
 
 
@@ -23,6 +27,15 @@ app = FastAPI(
     title="Decision Intelligence Platform API",
     lifespan=lifespan,
 )
+
+settings = get_settings()
+app.add_middleware(
+    RequestLoggingMiddleware,
+    metrics=metrics_collector,
+    observability_enabled=settings.observability_enabled,
+    metrics_enabled=settings.metrics_enabled,
+)
+app.add_middleware(CorrelationIdMiddleware)
 
 
 @app.exception_handler(RequestValidationError)
