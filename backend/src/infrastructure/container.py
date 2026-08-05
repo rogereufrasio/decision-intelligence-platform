@@ -1,3 +1,10 @@
+from src.application.ports import SearchRepository
+from src.application.travel.get_search_history import (
+    GetSearchHistoryUseCase,
+)
+from src.application.travel.get_search_snapshot import (
+    GetSearchSnapshotUseCase,
+)
 from src.application.travel.search_orchestrator import SearchOrchestrator
 from src.core.config import Settings, get_settings
 from src.domain.services.decision_engine import DecisionEngine
@@ -30,18 +37,35 @@ class Container:
             provider_names=[self.settings.travel_provider],
         )
         engine = DecisionEngine()
-        search_repository = None
-
-        if self.settings.search_persistence_enabled:
-            search_repository = DuckDBSearchRepository(
-                self.settings.search_database_path,
-            )
-
         return SearchOrchestrator(
             provider_strategy=strategy,
             decision_engine=engine,
-            search_repository=search_repository,
+            search_repository=self.get_search_repository(),
         )
+
+    def get_search_repository(self) -> SearchRepository | None:
+        if not self.settings.search_persistence_enabled:
+            return None
+
+        return DuckDBSearchRepository(
+            self.settings.search_database_path,
+        )
+
+    def get_search_history_use_case(
+        self,
+    ) -> GetSearchHistoryUseCase | None:
+        repository = self.get_search_repository()
+        if repository is None:
+            return None
+        return GetSearchHistoryUseCase(repository)
+
+    def get_search_snapshot_use_case(
+        self,
+    ) -> GetSearchSnapshotUseCase | None:
+        repository = self.get_search_repository()
+        if repository is None:
+            return None
+        return GetSearchSnapshotUseCase(repository)
 
     async def close(self):
 
