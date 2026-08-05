@@ -1,3 +1,5 @@
+from src.domain.models.ai_context import AIContext
+from src.domain.models.ai_explanation import AIExplanation
 from src.domain.models.decision_explanation import (
     DecisionExplanation,
     RecommendationEvaluation,
@@ -25,6 +27,8 @@ from src.domain.models.search_snapshot import SearchSnapshot
 from src.domain.models.travel_result import TravelResult
 
 __all__ = [
+    "AIContext",
+    "AIExplanation",
     "DecisionExplanation",
     "DecisionRule",
     "DecisionSnapshot",
