@@ -10,6 +10,9 @@ from src.application.travel.get_search_history import (
 from src.application.travel.get_search_snapshot import (
     GetSearchSnapshotUseCase,
 )
+from src.application.travel.recommend_travel_offers import (
+    RecommendTravelOffersUseCase,
+)
 from src.application.travel.travel_service import TravelService
 from src.infrastructure.container import Container
 
@@ -41,3 +44,7 @@ def get_compare_search_snapshots_use_case(
 def get_export_search_snapshot_use_case(
 ) -> ExportSearchSnapshotUseCase | None:
     return Container().get_export_search_snapshot_use_case()
+
+
+def get_recommend_travel_offers_use_case() -> RecommendTravelOffersUseCase:
+    return Container().get_recommend_travel_offers_use_case()

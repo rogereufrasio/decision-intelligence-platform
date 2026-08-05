@@ -13,9 +13,13 @@ from src.application.travel.get_search_history import (
 from src.application.travel.get_search_snapshot import (
     GetSearchSnapshotUseCase,
 )
+from src.application.travel.recommend_travel_offers import (
+    RecommendTravelOffersUseCase,
+)
 from src.application.travel.search_orchestrator import SearchOrchestrator
 from src.core.config import Settings, get_settings
 from src.domain.services.decision_engine import DecisionEngine
+from src.domain.services.recommendation_engine import RecommendationEngine
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.http.client import HttpClient
 from src.infrastructure.persistence import DuckDBSearchRepository
@@ -94,6 +98,16 @@ class Container:
         return ExportSearchSnapshotUseCase(
             repository=repository,
             export_directory=database_path.parent / "exports",
+        )
+
+    def get_recommendation_engine(self) -> RecommendationEngine:
+        return RecommendationEngine()
+
+    def get_recommend_travel_offers_use_case(
+        self,
+    ) -> RecommendTravelOffersUseCase:
+        return RecommendTravelOffersUseCase(
+            self.get_recommendation_engine()
         )
 
     async def close(self):
