@@ -8,6 +8,11 @@ export interface ApiRequestOptions extends RequestInit {
   correlationId?: string
 }
 
+export interface ApiResponse<T> {
+  data: T
+  correlationId: string | null
+}
+
 function errorDetails(payload: ApiErrorPayload | null, fallback: string) {
   if (typeof payload?.detail === 'string') return { message: payload.detail, code: 'api_error' }
   if (payload?.detail && typeof payload.detail === 'object') {
@@ -16,7 +21,7 @@ function errorDetails(payload: ApiErrorPayload | null, fallback: string) {
   return { message: fallback, code: 'api_error' }
 }
 
-export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+export async function apiRequestWithMeta<T>(path: string, options: ApiRequestOptions = {}): Promise<ApiResponse<T>> {
   const { timeoutMs = DEFAULT_TIMEOUT_MS, correlationId, headers, ...requestOptions } = options
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
@@ -32,7 +37,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
       const details = errorDetails(payload as ApiErrorPayload | null, `A API respondeu com status ${response.status}.`)
       throw new ApiError(details.message, response.status, details.code, responseCorrelationId)
     }
-    return payload as T
+    return { data: payload as T, correlationId: responseCorrelationId }
   } catch (error: unknown) {
     if (error instanceof ApiError) throw error
     if (error instanceof DOMException && error.name === 'AbortError') {
@@ -42,4 +47,9 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   } finally {
     window.clearTimeout(timeout)
   }
+}
+
+
+export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+  return (await apiRequestWithMeta<T>(path, options)).data
 }
