@@ -40,6 +40,21 @@ uv run ruff check src tests
 See [backend/README.md](backend/README.md) for configuration, endpoints,
 persistence and operational details.
 
+## Frontend v1.1
+
+O shell web em React/Vite está disponível em `frontend/`, com navegação
+responsiva, design system mínimo e monitoramento inicial de health/readiness.
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+O Vite encaminha `/api` para `http://localhost:8000` no desenvolvimento local.
+Configure `VITE_API_BASE_URL` apenas para outra origem. Consulte [frontend/README.md](frontend/README.md) para
+estrutura, testes e build.
+
 ## MVP scope
 
 - Multi-provider travel search and canonical offers
