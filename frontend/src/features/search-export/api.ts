@@ -1,4 +1,3 @@
-import { apiRequest } from '../../lib/api/client'
-import type { SearchExportResponse } from '../../types/comparison'
+import { apiRequestBlob } from '../../lib/api/client'
 
-export const exportSearchSnapshot = (searchId: string) => apiRequest<SearchExportResponse>(`/api/v1/search-history/${encodeURIComponent(searchId)}/export`)
+export const exportSearchSnapshot = (searchId: string) => apiRequestBlob(`/api/v1/search-history/${encodeURIComponent(searchId)}/export`)

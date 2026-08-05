@@ -4,6 +4,7 @@ import { getRecommendations } from '../recommendations/api'
 import { searchFlights } from './api'
 import { parsePreferredProviders, toRecommendationOffer, toSearchRequest } from './mappers'
 import type { FlightSearchResponse, RecommendationsResponse, SearchFormValues } from '../../types/travel'
+import { ApiError } from '../../lib/api/types'
 
 interface SearchState {
   searchResult: FlightSearchResponse | null
@@ -28,10 +29,12 @@ export function useTravelSearch() {
     setState({ ...initialState, searchLoading: true })
     let searchResponse: ApiResponse<FlightSearchResponse>
     try {
-      searchResponse = await searchFlights(toSearchRequest(values))
+      searchResponse = await searchFlights(toSearchRequest(values), values.travelProvider)
       setState((current) => ({ ...current, searchLoading: false, searchResult: searchResponse.data, correlationId: searchResponse.correlationId }))
-    } catch {
-      setState((current) => ({ ...current, searchLoading: false, searchError: 'Não foi possível realizar a busca.' }))
+    } catch (cause) {
+      const suffix = cause instanceof ApiError && cause.correlationId ? ` Correlação: ${cause.correlationId}.` : ''
+      const message = cause instanceof ApiError && cause.status > 0 ? cause.message : 'Não foi possível realizar a busca.'
+      setState((current) => ({ ...current, searchLoading: false, searchError: `${message}${suffix}` }))
       return
     }
 

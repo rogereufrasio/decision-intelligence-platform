@@ -3,8 +3,9 @@ import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import type { SearchFormValues } from '../../types/travel'
+import { getPreferredProvider, savePreferredProvider } from '../settings/providerPreference'
 
-const initialValues: SearchFormValues = { origin: '', destination: '', departureDate: '', returnDate: '', adults: 1, profile: 'balanced', preferredProviders: '' }
+const initialValues = (): SearchFormValues => ({ origin: '', destination: '', departureDate: '', returnDate: '', adults: 1, profile: 'balanced', preferredProviders: '', travelProvider: getPreferredProvider() })
 
 function validate(values: SearchFormValues) {
   const errors: Partial<Record<keyof SearchFormValues, string>> = {}
@@ -35,6 +36,7 @@ export function SearchForm({ onSubmit, loading }: { onSubmit: (values: SearchFor
         <div><Input label="Data de volta (opcional)" name="returnDate" type="date" value={values.returnDate} aria-invalid={Boolean(errors.returnDate)} aria-describedby={errors.returnDate ? 'returnDate-error' : undefined} onChange={(event) => update('returnDate', event.target.value)} />{error('returnDate')}</div>
         <div><Input label="Adultos" name="adults" type="number" min={1} value={values.adults} aria-invalid={Boolean(errors.adults)} aria-describedby={errors.adults ? 'adults-error' : undefined} onChange={(event) => update('adults', Number(event.target.value))} />{error('adults')}</div>
         <Select label="Perfil de preferência" name="profile" value={values.profile} onChange={(event) => update('profile', event.target.value as SearchFormValues['profile'])}><option value="cheapest">Menor preço</option><option value="fastest">Mais rápido</option><option value="balanced">Equilibrado</option><option value="premium">Premium</option></Select>
+        <Select label="Provider da busca" name="travelProvider" value={values.travelProvider} onChange={(event) => { const provider = event.target.value as SearchFormValues['travelProvider']; update('travelProvider', provider); savePreferredProvider(provider) }}><option value="mock">Mock</option><option value="amadeus">Amadeus</option><option value="duffel">Duffel</option></Select>
       </div>
       <div className="mt-4"><Input label="Providers preferidos (opcional, separados por vírgula)" name="preferredProviders" value={values.preferredProviders} onChange={(event) => update('preferredProviders', event.target.value)} /></div>
       <div className="mt-5"><Button type="submit" loading={loading}>{loading ? 'Buscando…' : 'Buscar viagens'}</Button></div>

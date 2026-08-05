@@ -61,7 +61,7 @@ test('submete busca e perfil com payloads contratuais corretos', async () => {
   expect(mocks.searchFlights).toHaveBeenCalledWith({
     origin: 'GIG', destination: 'GRU', departure_date: '2026-09-10',
     return_date: '2026-09-20', passengers: 2, sort_by: 'best_value',
-  })
+  }, 'mock')
   expect(mocks.getRecommendations).toHaveBeenCalledWith(
     expect.objectContaining({ profile: 'premium', preferred_providers: ['mock', 'amadeus'] }),
     'search-correlation',

@@ -1,5 +1,7 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi.responses import FileResponse
 
 from src.api.dependencies.travel import (
     get_export_search_snapshot_use_case,
@@ -7,12 +9,6 @@ from src.api.dependencies.travel import (
 from src.application.travel.export_search_snapshot import (
     ExportSearchSnapshotUseCase,
 )
-
-
-class SearchExportResponse(BaseModel):
-    search_id: str
-    file: str
-    format: str
 
 
 router = APIRouter(
@@ -23,14 +19,21 @@ router = APIRouter(
 
 @router.get(
     "/{search_id}/export",
-    response_model=SearchExportResponse,
 )
 async def export_search_snapshot(
     search_id: str,
     use_case: ExportSearchSnapshotUseCase | None = Depends(
         get_export_search_snapshot_use_case
     ),
-) -> SearchExportResponse:
+) -> FileResponse:
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", search_id):
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "invalid_search_id",
+                "message": "search_id contains invalid characters.",
+            },
+        )
     if use_case is None:
         raise HTTPException(
             status_code=503,
@@ -50,8 +53,8 @@ async def export_search_snapshot(
             },
         )
 
-    return SearchExportResponse(
-        search_id=search_id,
-        file=str(output_path),
-        format="parquet",
+    return FileResponse(
+        path=output_path,
+        media_type="application/vnd.apache.parquet",
+        filename=f"search_{search_id}.parquet",
     )

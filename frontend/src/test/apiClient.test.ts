@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { apiRequest } from '../lib/api/client'
+import { apiRequest, apiRequestBlob } from '../lib/api/client'
 import { jsonResponse } from './fixtures'
 
 describe('apiRequest', () => {
@@ -18,5 +18,15 @@ describe('apiRequest', () => {
   test('interrompe requisição por timeout', async () => {
     vi.stubGlobal('fetch', vi.fn((_url, init: RequestInit) => new Promise((_resolve, reject) => init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))))))
     await expect(apiRequest('/slow', { timeoutMs: 5 })).rejects.toMatchObject({ code: 'request_timeout' })
+  })
+
+  test('retorna Blob e nome informado no Content-Disposition', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('PAR1', {
+      status: 200,
+      headers: { 'Content-Disposition': 'attachment; filename="search_abc.parquet"' },
+    })))
+    const result = await apiRequestBlob('/api/v1/search-history/abc/export')
+    expect(result.fileName).toBe('search_abc.parquet')
+    expect(result.blob.size).toBe(4)
   })
 })

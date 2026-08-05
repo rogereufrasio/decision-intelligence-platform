@@ -40,7 +40,10 @@ async def test_duffel_provider_search_success(monkeypatch):
         def json(self):
             return self._payload
 
+    captured = {}
+
     async def fake_post(*args, **kwargs):
+        captured.update(kwargs)
         return FakeResponse(
             {
                 "data": [
@@ -77,6 +80,17 @@ async def test_duffel_provider_search_success(monkeypatch):
     assert len(result.offers) == 1
     assert result.offers[0].price == Decimal("300.00")
     assert result.offers[0].currency == "BRL"
+    assert captured["json"] == {
+        "slices": [{
+            "origin": "GIG",
+            "destination": "GRU",
+            "departure_date": "2026-10-01",
+        }],
+        "passengers": [{"type": "adult"}],
+    }
+    assert captured["headers"]["Authorization"] == (
+        "Bearer test-duffel-key"
+    )
 
 
 @pytest.mark.asyncio

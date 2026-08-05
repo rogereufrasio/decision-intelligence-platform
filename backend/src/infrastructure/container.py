@@ -63,9 +63,13 @@ class Container:
             client=self.http_client,
         )
 
-    def get_search_orchestrator(self) -> SearchOrchestrator:
+    def get_search_orchestrator(
+        self,
+        provider_name: str | None = None,
+    ) -> SearchOrchestrator:
         strategy = ProviderStrategy(
-            provider_names=[self.settings.travel_provider],
+            provider_names=[provider_name or self.settings.travel_provider],
+            client=self.http_client,
         )
         engine = DecisionEngine()
         return SearchOrchestrator(

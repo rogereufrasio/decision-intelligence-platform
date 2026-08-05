@@ -45,5 +45,13 @@ variáveis `VITE_*`, pois elas são públicas no bundle. O Dashboard consulta so
 - `src/styles`: Tailwind e estilos globais
 - `src/test`: configuração, fixtures e testes
 
-Busca, ofertas, recomendações, gráficos, histórico e autenticação não fazem parte
-do Bloco 50.
+## Providers e exportação
+
+A preferência entre `mock`, `amadeus` e `duffel` é armazenada localmente no
+navegador e enviada ao backend pelo header `X-Travel-Provider`. O frontend nunca
+recebe ou armazena credenciais; elas pertencem exclusivamente ao ambiente do
+backend. `mock` permanece como opção segura quando nenhuma preferência existe.
+
+Snapshots podem ser baixados em Parquet pelo Histórico e pelas Comparações. O
+download usa o conteúdo binário e o nome indicado em `Content-Disposition`, sem
+interpretar ou converter o arquivo no navegador.

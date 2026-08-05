@@ -3,8 +3,6 @@ import { Alert } from '../../components/ui/Alert'
 import { Button } from '../../components/ui/Button'
 import { exportSearchSnapshot } from './api'
 
-function fileName(path: string) { return path.split(/[\\/]/).pop() ?? path }
-
 export function ExportButton({ searchId }: { searchId: string }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -13,7 +11,9 @@ export function ExportButton({ searchId }: { searchId: string }) {
     setLoading(true); setMessage(null); setError(null)
     try {
       const result = await exportSearchSnapshot(searchId)
-      const link = document.createElement('a'); link.href = result.file; link.download = fileName(result.file); link.click()
+      const objectUrl = URL.createObjectURL(result.blob)
+      const link = document.createElement('a'); link.href = objectUrl; link.download = result.fileName ?? `search_${searchId}.parquet`; link.click()
+      URL.revokeObjectURL(objectUrl)
       setMessage(`Exportação preparada: ${link.download}`)
     } catch { setError('Não foi possível exportar o snapshot.') }
     finally { setLoading(false) }

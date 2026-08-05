@@ -3,9 +3,10 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { HistoryPage } from '../pages/HistoryPage'
 
-const mocks = vi.hoisted(() => ({ getSearchHistory: vi.fn(), getSearchSnapshot: vi.fn(), getPriceIntelligence: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getSearchHistory: vi.fn(), getSearchSnapshot: vi.fn(), getPriceIntelligence: vi.fn(), exportSearchSnapshot: vi.fn() }))
 vi.mock('../features/history/api', () => ({ getSearchHistory: mocks.getSearchHistory, getSearchSnapshot: mocks.getSearchSnapshot }))
 vi.mock('../features/price-intelligence/api', () => ({ getPriceIntelligence: mocks.getPriceIntelligence }))
+vi.mock('../features/search-export/api', () => ({ exportSearchSnapshot: mocks.exportSearchSnapshot }))
 
 const offer = { provider: 'mock', product_type: 'flight', price: '1234.50', currency: 'BRL', metadata: null, attributes: { total_duration_minutes: 120 } }
 const snapshot = {
@@ -24,6 +25,9 @@ beforeEach(() => {
   mocks.getSearchHistory.mockResolvedValue({ items: [snapshot, other], total: 2 })
   mocks.getSearchSnapshot.mockResolvedValue(snapshot)
   mocks.getPriceIntelligence.mockResolvedValue(price)
+  mocks.exportSearchSnapshot.mockResolvedValue({ blob: new Blob(['PAR1']), fileName: 'search_search-1.parquet', correlationId: null })
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+  vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn(() => 'blob:history'), revokeObjectURL: vi.fn() })
 })
 
 test('exibe histórico vazio', async () => {
@@ -86,4 +90,12 @@ test('atualiza manualmente e amplia o limite local', async () => {
   await waitFor(() => expect(mocks.getSearchHistory).toHaveBeenCalledTimes(2))
   await userEvent.click(screen.getByRole('button', { name: 'Carregar mais' }))
   await waitFor(() => expect(mocks.getSearchHistory).toHaveBeenLastCalledWith(40))
+})
+
+test('exporta snapshot pelo Histórico e revoga a URL temporária', async () => {
+  render(<HistoryPage />); await screen.findByText(/GIG/)
+  await userEvent.click(screen.getAllByRole('button', { name: 'Exportar Parquet' })[0]!)
+  expect(await screen.findByText('Exportação preparada: search_search-1.parquet')).toBeInTheDocument()
+  expect(mocks.exportSearchSnapshot).toHaveBeenCalledWith('search-1')
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:history')
 })

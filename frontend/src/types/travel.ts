@@ -1,4 +1,5 @@
 export type PreferenceProfile = 'cheapest' | 'fastest' | 'balanced' | 'premium'
+export type TravelProvider = 'mock' | 'amadeus' | 'duffel'
 
 export interface SearchFormValues {
   origin: string
@@ -8,6 +9,7 @@ export interface SearchFormValues {
   adults: number
   profile: PreferenceProfile
   preferredProviders: string
+  travelProvider: TravelProvider
 }
 
 export interface FlightSearchRequest {

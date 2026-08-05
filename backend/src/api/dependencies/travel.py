@@ -1,3 +1,7 @@
+from typing import Annotated, Literal
+
+from fastapi import Header
+
 from src.application.ports import AIAssistant
 from src.application.travel.analyze_price_history import (
     AnalyzePriceHistoryUseCase,
@@ -35,14 +39,19 @@ def get_decision_history_use_case() -> GetDecisionHistoryUseCase | None:
     return Container().get_decision_history_use_case()
 
 
-def get_travel_service() -> TravelService:
+def get_travel_service(
+    provider: Annotated[
+        Literal["mock", "amadeus", "duffel"] | None,
+        Header(alias="X-Travel-Provider"),
+    ] = None,
+) -> TravelService:
     """
     Cria o serviço de viagem.
     """
 
     container = Container()
     return TravelService(
-        orchestrator=container.get_search_orchestrator(),
+        orchestrator=container.get_search_orchestrator(provider),
     )
 
 

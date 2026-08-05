@@ -23,8 +23,9 @@ const comparison = {
 beforeEach(() => {
   vi.clearAllMocks(); mocks.getComparisonSnapshots.mockResolvedValue({ items: [base, target], total: 2 })
   mocks.compareSnapshots.mockResolvedValue(comparison)
-  mocks.exportSearchSnapshot.mockResolvedValue({ search_id: 'base', file: '/exports/search_base.parquet', format: 'parquet' })
+  mocks.exportSearchSnapshot.mockResolvedValue({ blob: new Blob(['PAR1']), fileName: 'search_base.parquet', correlationId: null })
   vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+  vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn(() => 'blob:test'), revokeObjectURL: vi.fn() })
 })
 
 async function selectBoth() {
@@ -76,6 +77,7 @@ test('inicia exportação com o nome retornado pela API', async () => {
   await user.click(screen.getByRole('button', { name: 'Exportar Parquet' }))
   expect(await screen.findByText('Exportação preparada: search_base.parquet')).toBeInTheDocument()
   expect(mocks.exportSearchSnapshot).toHaveBeenCalledWith('base')
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test')
 })
 
 test('não fabrica arquivo quando exportação falha', async () => {

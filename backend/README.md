@@ -78,6 +78,16 @@ Assistive AI is optional and accessed through `AIAssistant`. The included
 | GET | `/api/v1/decision-history` | Decision history |
 | POST | `/api/v1/ai-explanations` | Optional assisted explanation |
 
+## Travel provider selection and Parquet download
+
+`POST /api/v1/flights/search` accepts the optional `X-Travel-Provider` header
+with `mock`, `amadeus`, or `duffel`. Without it, `TRAVEL_PROVIDER` is used and
+defaults to `mock`. Amadeus and Duffel credentials remain server-side environment
+variables and are never returned in responses or readiness messages.
+
+`GET /api/v1/search-history/{search_id}/export` returns the Parquet bytes with a
+safe attachment filename. It does not expose the server filesystem path.
+
 ## Operational behavior and limitations
 
 Every response receives a correlation ID and security headers. Request logs are

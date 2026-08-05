@@ -21,6 +21,7 @@ class FakeExportUseCase:
 
 def test_search_export_returns_file_response(tmp_path: Path) -> None:
     output_path = tmp_path / "search_search-1.parquet"
+    output_path.write_bytes(b"PAR1testPAR1")
     app.dependency_overrides[
         get_export_search_snapshot_use_case
     ] = lambda: FakeExportUseCase(output_path)
@@ -32,11 +33,13 @@ def test_search_export_returns_file_response(tmp_path: Path) -> None:
         app.dependency_overrides.clear()
 
     assert response.status_code == 200
-    assert response.json() == {
-        "search_id": "search-1",
-        "file": str(output_path),
-        "format": "parquet",
-    }
+    assert response.content == b"PAR1testPAR1"
+    assert response.headers["content-type"] == (
+        "application/vnd.apache.parquet"
+    )
+    assert "search_search-1.parquet" in response.headers[
+        "content-disposition"
+    ]
 
 
 def test_search_export_returns_404_when_snapshot_is_missing() -> None:
@@ -71,3 +74,18 @@ def test_search_export_returns_503_when_persistence_disabled() -> None:
     assert response.json()["detail"]["code"] == (
         "search_persistence_disabled"
     )
+
+
+def test_search_export_rejects_path_traversal() -> None:
+    app.dependency_overrides[
+        get_export_search_snapshot_use_case
+    ] = lambda: FakeExportUseCase(Path("unused"))
+    try:
+        response = client.get(
+            "/api/v1/search-history/%2E%2E%5Csecret/export"
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 422
+    assert response.json()["detail"]["code"] == "invalid_search_id"
