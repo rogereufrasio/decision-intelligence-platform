@@ -14,6 +14,7 @@ from src.application.travel.compare_search_snapshots import (
 from src.application.travel.export_search_snapshot import (
     ExportSearchSnapshotUseCase,
 )
+from src.application.travel.explain_decision import ExplainDecisionUseCase
 from src.application.travel.get_search_history import (
     GetSearchHistoryUseCase,
 )
@@ -28,6 +29,7 @@ from src.application.travel.search_orchestrator import SearchOrchestrator
 from src.application.travel.save_decision_snapshot import SaveDecisionSnapshotUseCase
 from src.core.config import Settings, get_settings
 from src.domain.services.decision_engine import DecisionEngine
+from src.domain.services import AIPromptBuilder
 from src.domain.services.price_intelligence_engine import (
     PriceIntelligenceEngine,
 )
@@ -87,6 +89,17 @@ class Container:
         raise ValueError(
             "Unsupported AI assistant provider: "
             f"{self.settings.ai_assistant_provider}"
+        )
+
+    def get_explain_decision_use_case(
+        self,
+    ) -> ExplainDecisionUseCase | None:
+        assistant = self.get_ai_assistant()
+        if assistant is None:
+            return None
+        return ExplainDecisionUseCase(
+            assistant=assistant,
+            prompt_builder=AIPromptBuilder(),
         )
 
     def get_decision_repository(self) -> DecisionRepository | None:
