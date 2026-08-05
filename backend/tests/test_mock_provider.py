@@ -24,3 +24,7 @@ async def test_mock_provider():
     assert response.provider == "mock"
 
     assert response.status == "success"
+    assert len(response.offers) == 1
+    assert str(response.offers[0].price) == "450.00"
+    assert response.offers[0].currency == "BRL"
+    assert response.offers[0].provider == "mock"

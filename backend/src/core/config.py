@@ -57,6 +57,8 @@ class Settings(BaseSettings):
 
     http_timeout_seconds: int = 30
 
+    cors_allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

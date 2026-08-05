@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.router import api_router
 from src.api.middleware.correlation_id import CorrelationIdMiddleware
@@ -30,6 +31,17 @@ app = FastAPI(
 )
 
 settings = get_settings()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in settings.cors_allowed_origins.split(",")
+        if origin.strip()
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Correlation-ID", "X-Travel-Provider"],
+)
 app.add_middleware(
     RequestLoggingMiddleware,
     metrics=metrics_collector,

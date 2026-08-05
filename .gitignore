@@ -39,6 +39,9 @@ site/
 
 # Frontend
 coverage/
+playwright-report/
+test-results/
+.tmp/
 
 # Docker
 *.pid

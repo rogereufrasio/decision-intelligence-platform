@@ -55,6 +55,29 @@ O Vite encaminha `/api` para `http://localhost:8000` no desenvolvimento local.
 Configure `VITE_API_BASE_URL` apenas para outra origem. Consulte [frontend/README.md](frontend/README.md) para
 estrutura, testes e build.
 
+## Execução integrada e E2E
+
+O backend usa `http://127.0.0.1:8000` e o frontend usa
+`http://127.0.0.1:5173`. Inicie ambos, com encerramento coordenado, usando:
+
+```powershell
+.\scripts\dev.ps1
+```
+
+O CORS aceita por padrão apenas as origens locais do Vite. Para ambientes
+diferentes, configure `CORS_ALLOWED_ORIGINS` como uma lista separada por
+vírgulas, sem wildcard ou credenciais.
+
+Os testes E2E usam Chromium, provider mock e bancos temporários em `.tmp/`,
+removidos ao final:
+
+```powershell
+cd frontend
+npx playwright install chromium
+cd ..
+.\scripts\test-e2e.ps1
+```
+
 ## MVP scope
 
 - Multi-provider travel search and canonical offers

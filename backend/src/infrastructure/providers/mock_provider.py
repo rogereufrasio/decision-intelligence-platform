@@ -1,4 +1,4 @@
-from src.domain.travel.models import TravelResult
+from src.domain.travel.models import TravelOffer, TravelResult
 from src.domain.travel.provider import TravelProvider
 from src.shared.models import TravelSearchRequest
 
@@ -19,7 +19,18 @@ class MockTravelProvider(
                 f"Travel search received: "
                 f"{request.origin} -> {request.destination}"
             ),
-            offers=[],
+            offers=[
+                TravelOffer(
+                    provider="mock",
+                    product_type="flight",
+                    price="450.00",
+                    currency="BRL",
+                    attributes={
+                        "total_duration_minutes": 120,
+                        "stops": 0,
+                    },
+                )
+            ],
         )
 
 
