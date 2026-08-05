@@ -1,8 +1,10 @@
 from pathlib import Path
 
-from src.application.ports import DecisionRepository, SearchRepository
-from src.application.travel.get_decision_history import GetDecisionHistoryUseCase
-from src.application.travel.save_decision_snapshot import SaveDecisionSnapshotUseCase
+from src.application.ports import (
+    AIAssistant,
+    DecisionRepository,
+    SearchRepository,
+)
 from src.application.travel.analyze_price_history import (
     AnalyzePriceHistoryUseCase,
 )
@@ -18,10 +20,12 @@ from src.application.travel.get_search_history import (
 from src.application.travel.get_search_snapshot import (
     GetSearchSnapshotUseCase,
 )
+from src.application.travel.get_decision_history import GetDecisionHistoryUseCase
 from src.application.travel.recommend_travel_offers import (
     RecommendTravelOffersUseCase,
 )
 from src.application.travel.search_orchestrator import SearchOrchestrator
+from src.application.travel.save_decision_snapshot import SaveDecisionSnapshotUseCase
 from src.core.config import Settings, get_settings
 from src.domain.services.decision_engine import DecisionEngine
 from src.domain.services.price_intelligence_engine import (
@@ -29,6 +33,7 @@ from src.domain.services.price_intelligence_engine import (
 )
 from src.domain.services.recommendation_engine import RecommendationEngine
 from src.domain.travel.provider import TravelProvider
+from src.infrastructure.ai import TemplateAIAssistant
 from src.infrastructure.http.client import HttpClient
 from src.infrastructure.persistence import (
     DuckDBDecisionRepository,
@@ -72,6 +77,16 @@ class Container:
 
         return DuckDBSearchRepository(
             self.settings.search_database_path,
+        )
+
+    def get_ai_assistant(self) -> AIAssistant | None:
+        if not self.settings.ai_assistant_enabled:
+            return None
+        if self.settings.ai_assistant_provider == "template":
+            return TemplateAIAssistant()
+        raise ValueError(
+            "Unsupported AI assistant provider: "
+            f"{self.settings.ai_assistant_provider}"
         )
 
     def get_decision_repository(self) -> DecisionRepository | None:

@@ -1,3 +1,4 @@
+from src.application.ports import AIAssistant
 from src.application.travel.analyze_price_history import (
     AnalyzePriceHistoryUseCase,
 )
@@ -7,6 +8,7 @@ from src.application.travel.compare_search_snapshots import (
 from src.application.travel.export_search_snapshot import (
     ExportSearchSnapshotUseCase,
 )
+from src.application.travel.get_decision_history import GetDecisionHistoryUseCase
 from src.application.travel.get_search_history import (
     GetSearchHistoryUseCase,
 )
@@ -18,6 +20,10 @@ from src.application.travel.recommend_travel_offers import (
 )
 from src.application.travel.travel_service import TravelService
 from src.infrastructure.container import Container
+
+
+def get_ai_assistant() -> AIAssistant | None:
+    return Container().get_ai_assistant()
 
 
 def get_decision_history_use_case() -> GetDecisionHistoryUseCase | None:
@@ -60,4 +66,3 @@ def get_recommend_travel_offers_use_case() -> RecommendTravelOffersUseCase:
 def get_analyze_price_history_use_case(
 ) -> AnalyzePriceHistoryUseCase | None:
     return Container().get_analyze_price_history_use_case()
-from src.application.travel.get_decision_history import GetDecisionHistoryUseCase

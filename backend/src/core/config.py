@@ -27,6 +27,10 @@ class Settings(BaseSettings):
 
     decision_database_path: str = "../data/decisions.duckdb"
 
+    ai_assistant_enabled: bool = False
+
+    ai_assistant_provider: str = "template"
+
     amadeus_base_url: str = (
         "https://test.api.amadeus.com"
     )
