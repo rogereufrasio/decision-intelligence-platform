@@ -8,6 +8,7 @@ from src.domain.models.decision_rule import (
     RuleEvaluationResult,
     RuleOperator,
 )
+from src.domain.models.decision_snapshot import DecisionSnapshot
 from src.domain.models.offer import Offer
 from src.domain.models.price_intelligence import (
     PriceIntelligence,
@@ -26,6 +27,7 @@ from src.domain.models.travel_result import TravelResult
 __all__ = [
     "DecisionExplanation",
     "DecisionRule",
+    "DecisionSnapshot",
     "Offer",
     "PriceIntelligence",
     "PriceTrend",

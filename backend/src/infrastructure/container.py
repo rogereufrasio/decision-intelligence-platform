@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from src.application.ports import SearchRepository
+from src.application.ports import DecisionRepository, SearchRepository
+from src.application.travel.get_decision_history import GetDecisionHistoryUseCase
+from src.application.travel.save_decision_snapshot import SaveDecisionSnapshotUseCase
 from src.application.travel.analyze_price_history import (
     AnalyzePriceHistoryUseCase,
 )
@@ -28,7 +30,10 @@ from src.domain.services.price_intelligence_engine import (
 from src.domain.services.recommendation_engine import RecommendationEngine
 from src.domain.travel.provider import TravelProvider
 from src.infrastructure.http.client import HttpClient
-from src.infrastructure.persistence import DuckDBSearchRepository
+from src.infrastructure.persistence import (
+    DuckDBDecisionRepository,
+    DuckDBSearchRepository,
+)
 from src.infrastructure.providers.provider_factory import ProviderFactory
 from src.infrastructure.providers.provider_strategy import ProviderStrategy
 
@@ -68,6 +73,23 @@ class Container:
         return DuckDBSearchRepository(
             self.settings.search_database_path,
         )
+
+    def get_decision_repository(self) -> DecisionRepository | None:
+        if not self.settings.decision_persistence_enabled:
+            return None
+        return DuckDBDecisionRepository(self.settings.decision_database_path)
+
+    def get_save_decision_snapshot_use_case(
+        self,
+    ) -> SaveDecisionSnapshotUseCase | None:
+        repository = self.get_decision_repository()
+        return SaveDecisionSnapshotUseCase(repository) if repository else None
+
+    def get_decision_history_use_case(
+        self,
+    ) -> GetDecisionHistoryUseCase | None:
+        repository = self.get_decision_repository()
+        return GetDecisionHistoryUseCase(repository) if repository else None
 
     def get_search_history_use_case(
         self,

@@ -23,6 +23,10 @@ class Settings(BaseSettings):
         "../data/searches.duckdb"
     )
 
+    decision_persistence_enabled: bool = False
+
+    decision_database_path: str = "../data/decisions.duckdb"
+
     amadeus_base_url: str = (
         "https://test.api.amadeus.com"
     )

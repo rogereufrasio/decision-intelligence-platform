@@ -20,6 +20,10 @@ from src.application.travel.travel_service import TravelService
 from src.infrastructure.container import Container
 
 
+def get_decision_history_use_case() -> GetDecisionHistoryUseCase | None:
+    return Container().get_decision_history_use_case()
+
+
 def get_travel_service() -> TravelService:
     """
     Cria o serviço de viagem.
@@ -56,3 +60,4 @@ def get_recommend_travel_offers_use_case() -> RecommendTravelOffersUseCase:
 def get_analyze_price_history_use_case(
 ) -> AnalyzePriceHistoryUseCase | None:
     return Container().get_analyze_price_history_use_case()
+from src.application.travel.get_decision_history import GetDecisionHistoryUseCase
