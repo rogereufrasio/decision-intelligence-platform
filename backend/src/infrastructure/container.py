@@ -1,4 +1,12 @@
+from pathlib import Path
+
 from src.application.ports import SearchRepository
+from src.application.travel.compare_search_snapshots import (
+    CompareSearchSnapshotsUseCase,
+)
+from src.application.travel.export_search_snapshot import (
+    ExportSearchSnapshotUseCase,
+)
 from src.application.travel.get_search_history import (
     GetSearchHistoryUseCase,
 )
@@ -66,6 +74,27 @@ class Container:
         if repository is None:
             return None
         return GetSearchSnapshotUseCase(repository)
+
+    def get_compare_search_snapshots_use_case(
+        self,
+    ) -> CompareSearchSnapshotsUseCase | None:
+        repository = self.get_search_repository()
+        if repository is None:
+            return None
+        return CompareSearchSnapshotsUseCase(repository)
+
+    def get_export_search_snapshot_use_case(
+        self,
+    ) -> ExportSearchSnapshotUseCase | None:
+        repository = self.get_search_repository()
+        if repository is None:
+            return None
+
+        database_path = Path(self.settings.search_database_path)
+        return ExportSearchSnapshotUseCase(
+            repository=repository,
+            export_directory=database_path.parent / "exports",
+        )
 
     async def close(self):
 

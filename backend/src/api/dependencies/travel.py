@@ -1,3 +1,9 @@
+from src.application.travel.compare_search_snapshots import (
+    CompareSearchSnapshotsUseCase,
+)
+from src.application.travel.export_search_snapshot import (
+    ExportSearchSnapshotUseCase,
+)
 from src.application.travel.get_search_history import (
     GetSearchHistoryUseCase,
 )
@@ -25,3 +31,13 @@ def get_search_history_use_case() -> GetSearchHistoryUseCase | None:
 
 def get_search_snapshot_use_case() -> GetSearchSnapshotUseCase | None:
     return Container().get_search_snapshot_use_case()
+
+
+def get_compare_search_snapshots_use_case(
+) -> CompareSearchSnapshotsUseCase | None:
+    return Container().get_compare_search_snapshots_use_case()
+
+
+def get_export_search_snapshot_use_case(
+) -> ExportSearchSnapshotUseCase | None:
+    return Container().get_export_search_snapshot_use_case()
