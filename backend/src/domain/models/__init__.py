@@ -1,4 +1,8 @@
 from src.domain.models.offer import Offer
+from src.domain.models.price_intelligence import (
+    PriceIntelligence,
+    PriceTrend,
+)
 from src.domain.models.preference_profile import (
     PreferenceProfile,
     PreferenceProfileName,
@@ -11,6 +15,8 @@ from src.domain.models.travel_result import TravelResult
 
 __all__ = [
     "Offer",
+    "PriceIntelligence",
+    "PriceTrend",
     "PreferenceProfile",
     "PreferenceProfileName",
     "Recommendation",

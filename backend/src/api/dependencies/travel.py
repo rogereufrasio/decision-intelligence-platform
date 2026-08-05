@@ -1,3 +1,6 @@
+from src.application.travel.analyze_price_history import (
+    AnalyzePriceHistoryUseCase,
+)
 from src.application.travel.compare_search_snapshots import (
     CompareSearchSnapshotsUseCase,
 )
@@ -48,3 +51,8 @@ def get_export_search_snapshot_use_case(
 
 def get_recommend_travel_offers_use_case() -> RecommendTravelOffersUseCase:
     return Container().get_recommend_travel_offers_use_case()
+
+
+def get_analyze_price_history_use_case(
+) -> AnalyzePriceHistoryUseCase | None:
+    return Container().get_analyze_price_history_use_case()
