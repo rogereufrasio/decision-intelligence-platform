@@ -70,7 +70,9 @@ async def search_flights(
             provider=result.provider,
             total_amount=str(offer.price),
             currency=offer.currency,
-            total_duration_minutes=0,
+            total_duration_minutes=(offer.attributes or {}).get(
+                "total_duration_minutes", 0
+            ),
             slices=[],
         )
         for index, offer in enumerate(result.offers)

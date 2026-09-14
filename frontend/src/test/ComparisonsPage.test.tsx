@@ -16,7 +16,7 @@ const makeSnapshot = (id: string, origin: string, destination: string) => ({
 const base = makeSnapshot('base', 'GIG', 'GRU'); const target = makeSnapshot('target', 'BSB', 'SSA')
 const comparison = {
   base_search_id: 'base', target_search_id: 'target', currency: 'BRL', base_lowest_price: '500.00', target_lowest_price: '450.00',
-  absolute_price_difference: '-50.00', percentage_price_difference: '-10.00', base_best_provider: 'mock', target_best_provider: 'amadeus',
+  absolute_price_difference: '50.00', percentage_price_difference: '-10.00', base_best_provider: 'mock', target_best_provider: 'amadeus',
   base_offer_count: 2, target_offer_count: 3, added_providers: ['amadeus'], removed_providers: ['mock'],
 }
 
@@ -56,7 +56,7 @@ test('exibe comparação negativa e providers adicionados e removidos', async ()
 })
 
 test('exibe comparação positiva', async () => {
-  mocks.compareSnapshots.mockResolvedValue({ ...comparison, absolute_price_difference: '50.00', percentage_price_difference: '10.00' })
+  mocks.compareSnapshots.mockResolvedValue({ ...comparison, target_lowest_price: '550.00', absolute_price_difference: '50.00', percentage_price_difference: '10.00' })
   const user = await selectBoth(); await user.click(screen.getByRole('button', { name: 'Comparar selecionadas' }))
   expect(await screen.findByText('Aumento')).toBeInTheDocument()
 })

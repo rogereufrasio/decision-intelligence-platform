@@ -8,6 +8,7 @@ import duckdb
 
 from src.application.ports.search_repository import SearchRepository
 from src.domain.models.search_snapshot import SearchSnapshot
+from src.domain.models.search_criteria import SearchCriteria
 
 
 class DuckDBSearchRepository(SearchRepository):
@@ -54,6 +55,20 @@ class DuckDBSearchRepository(SearchRepository):
         if limit < 1:
             return []
         return await asyncio.to_thread(self._list_recent, limit)
+
+    async def list_by_criteria(
+        self,
+        criteria: SearchCriteria,
+        limit: int = 20,
+    ) -> list[SearchSnapshot]:
+        if limit < 1:
+            return []
+        criteria_json = self._to_json(criteria.model_dump(mode="json"))
+        return await asyncio.to_thread(
+            self._list_by_criteria,
+            criteria_json,
+            limit,
+        )
 
     def _save(self, snapshot: SearchSnapshot) -> None:
         payload = snapshot.model_dump(mode="json")
@@ -125,6 +140,29 @@ class DuckDBSearchRepository(SearchRepository):
                 LIMIT ?
                 """,
                 [limit],
+            ).fetchall()
+        finally:
+            connection.close()
+
+        return [self._to_snapshot(row) for row in rows]
+
+    def _list_by_criteria(
+        self,
+        criteria_json: str,
+        limit: int,
+    ) -> list[SearchSnapshot]:
+        connection = self._connect()
+        try:
+            connection.execute(self._CREATE_TABLE_SQL)
+            rows = connection.execute(
+                f"""
+                SELECT {self._SELECT_COLUMNS}
+                FROM search_snapshots
+                WHERE criteria_json = ?
+                ORDER BY created_at DESC, search_id ASC
+                LIMIT ?
+                """,
+                [criteria_json, limit],
             ).fetchall()
         finally:
             connection.close()

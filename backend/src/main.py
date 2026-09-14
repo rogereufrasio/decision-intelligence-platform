@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -59,10 +60,10 @@ app.add_middleware(
 async def validation_exception_handler(request, exc):
     return JSONResponse(
         status_code=400,
-        content={
+        content=jsonable_encoder({
             "detail": exc.errors(),
             "body": exc.body,
-        },
+        }, custom_encoder={ValueError: str}),
     )
 
 

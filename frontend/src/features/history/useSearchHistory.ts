@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SearchHistoryResponse, SearchSnapshot } from '../../types/history'
 import { getSearchHistory, getSearchSnapshot } from './api'
 
 export function useSearchHistory() {
+  const selection = useRef(0)
   const [limit, setLimit] = useState(20)
   const [history, setHistory] = useState<SearchHistoryResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -18,10 +19,16 @@ export function useSearchHistory() {
   useEffect(refresh, [refresh])
 
   async function select(searchId: string) {
+    const currentSelection = ++selection.current
     setDetailLoading(true); setDetailError(null); setDetail(null)
-    try { setDetail(await getSearchSnapshot(searchId)) }
-    catch { setDetailError('Não foi possível carregar os detalhes da busca.') }
-    finally { setDetailLoading(false) }
+    try {
+      const snapshot = await getSearchSnapshot(searchId)
+      if (currentSelection === selection.current) setDetail(snapshot)
+    }
+    catch {
+      if (currentSelection === selection.current) setDetailError('Não foi possível carregar os detalhes da busca.')
+    }
+    finally { if (currentSelection === selection.current) setDetailLoading(false) }
   }
 
   return { limit, history, loading, error, detail, detailLoading, detailError, refresh, loadMore: () => setLimit((value) => Math.min(value + 20, 100)), select }

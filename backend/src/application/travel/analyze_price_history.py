@@ -24,7 +24,10 @@ class AnalyzePriceHistoryUseCase:
         if base_snapshot is None:
             return None
 
-        recent_snapshots = await self.repository.list_recent(limit)
+        recent_snapshots = await self.repository.list_by_criteria(
+            base_snapshot.criteria,
+            limit,
+        )
         comparable_snapshots = [
             base_snapshot,
             *[

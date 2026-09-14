@@ -19,6 +19,17 @@ class FakeSearchRepository:
     async def list_recent(self, limit: int = 20) -> list[SearchSnapshot]:
         return list(self.snapshots.values())[:limit]
 
+    async def list_by_criteria(
+        self,
+        criteria,
+        limit: int = 20,
+    ) -> list[SearchSnapshot]:
+        return [
+            snapshot
+            for snapshot in self.snapshots.values()
+            if snapshot.criteria == criteria
+        ][:limit]
+
 
 @pytest.mark.asyncio
 async def test_analyzes_existing_search_history() -> None:
@@ -33,6 +44,26 @@ async def test_analyzes_existing_search_history() -> None:
     result = await use_case.execute("current")
 
     assert result is not None
+    assert result.trend == PriceTrend.DECREASED
+
+
+@pytest.mark.asyncio
+async def test_limit_is_applied_after_selecting_comparable_snapshots() -> None:
+    unrelated = [
+        create_snapshot(f"unrelated-{index}", "50", destination="BSB")
+        for index in range(20)
+    ]
+    current = create_snapshot("current", "90")
+    previous = create_snapshot("previous", "100", days_ago=1)
+    use_case = AnalyzePriceHistoryUseCase(
+        FakeSearchRepository([*unrelated, current, previous]),
+        PriceIntelligenceEngine(),
+    )
+
+    result = await use_case.execute("current", limit=20)
+
+    assert result is not None
+    assert result.snapshot_count == 2
     assert result.trend == PriceTrend.DECREASED
 
 

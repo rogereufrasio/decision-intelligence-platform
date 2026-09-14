@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ApiError } from '../../lib/api/types'
 import type { SearchComparisonResponse } from '../../types/comparison'
 import type { SearchSnapshot } from '../../types/history'
@@ -12,6 +12,7 @@ function comparisonError(error: unknown) {
 }
 
 export function useComparison() {
+  const operation = useRef(0)
   const [snapshots, setSnapshots] = useState<SearchSnapshot[]>([])
   const [selected, setSelected] = useState<string[]>([])
   const [result, setResult] = useState<SearchComparisonResponse | null>(null)
@@ -25,15 +26,22 @@ export function useComparison() {
   }, [])
   useEffect(refresh, [refresh])
   function toggle(searchId: string) {
+    operation.current += 1; setLoading(false)
     setResult(null); setError(null)
     setSelected((current) => current.includes(searchId) ? current.filter((id) => id !== searchId) : current.length < 2 ? [...current, searchId] : [current[1]!, searchId])
   }
   async function compare() {
     if (selected.length !== 2 || selected[0] === selected[1]) return
+    const currentOperation = ++operation.current
     setLoading(true); setError(null)
-    try { setResult(await compareSnapshots(selected[0]!, selected[1]!)) }
-    catch (cause) { setResult(null); setError(comparisonError(cause)) }
-    finally { setLoading(false) }
+    try {
+      const comparison = await compareSnapshots(selected[0]!, selected[1]!)
+      if (currentOperation === operation.current) setResult(comparison)
+    }
+    catch (cause) {
+      if (currentOperation === operation.current) { setResult(null); setError(comparisonError(cause)) }
+    }
+    finally { if (currentOperation === operation.current) setLoading(false) }
   }
-  return { snapshots, selected, result, loadingList, loading, listError, error, refresh, toggle, compare, clear: () => { setSelected([]); setResult(null); setError(null) } }
+  return { snapshots, selected, result, loadingList, loading, listError, error, refresh, toggle, compare, clear: () => { operation.current += 1; setLoading(false); setSelected([]); setResult(null); setError(null) } }
 }

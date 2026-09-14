@@ -23,6 +23,17 @@ class FakeSearchRepository:
     async def list_recent(self, limit: int = 20) -> list[SearchSnapshot]:
         return list(self.snapshots.values())[:limit]
 
+    async def list_by_criteria(
+        self,
+        criteria,
+        limit: int = 20,
+    ) -> list[SearchSnapshot]:
+        return [
+            item
+            for item in self.snapshots.values()
+            if item.criteria == criteria
+        ][:limit]
+
 
 def snapshot(search_id: str, price: str, days_ago: int = 0) -> SearchSnapshot:
     return SearchSnapshot(

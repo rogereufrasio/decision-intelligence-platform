@@ -142,6 +142,28 @@ async def test_list_recent_applies_limit(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
+async def test_list_by_criteria_filters_before_applying_limit(
+    tmp_path: Path,
+) -> None:
+    repository = DuckDBSearchRepository(tmp_path / "searches.duckdb")
+    base_time = datetime(2026, 9, 3, 10, 0, tzinfo=timezone.utc)
+    comparable = create_snapshot("comparable", base_time)
+    unrelated = create_snapshot("unrelated", base_time + timedelta(hours=1))
+    unrelated = unrelated.model_copy(update={
+        "criteria": unrelated.criteria.model_copy(update={"destination": "BSB"}),
+    })
+    await repository.save(comparable)
+    await repository.save(unrelated)
+
+    snapshots = await repository.list_by_criteria(
+        comparable.criteria,
+        limit=1,
+    )
+
+    assert [snapshot.search_id for snapshot in snapshots] == ["comparable"]
+
+
+@pytest.mark.asyncio
 async def test_repositories_use_isolated_databases(tmp_path: Path) -> None:
     first = DuckDBSearchRepository(tmp_path / "first.duckdb")
     second = DuckDBSearchRepository(tmp_path / "second.duckdb")
